@@ -1,0 +1,103 @@
+# YACS 本機開發環境（docker compose）。
+# 用法：cp .env.example .env && docker compose up -d
+# 注意：此檔僅供開發；測試用 compose.test.yaml，正式用 compose.prod.yaml。
+
+name: yacs-dev
+
+x-app: &app
+  build:
+    context: .
+    dockerfile: infra/docker/app/Dockerfile
+    target: dev
+  image: yacs-app:dev
+  env_file: .env
+  volumes:
+    - .:/app
+  depends_on:
+    postgres: { condition: service_healthy }
+    redis-queue: { condition: service_healthy }
+    redis-cache: { condition: service_healthy }
+  restart: unless-stopped
+
+services:
+  app:
+    <<: *app
+    command: ["php", "artisan", "octane:start", "--server=frankenphp", "--host=0.0.0.0", "--port=8000", "--workers=4", "--max-requests=500"]
+    ports: ["${YACS_APP_PORT:-8000}:8000"]
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8000/up"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  reverb:
+    <<: *app
+    command: ["php", "artisan", "reverb:start", "--host=0.0.0.0", "--port=8080"]
+    ports: ["${YACS_REVERB_PORT:-8080}:8080"]
+
+  horizon:
+    <<: *app
+    command: ["php", "artisan", "horizon"]
+
+  scheduler:
+    <<: *app
+    # 排程含 outbox dispatcher 與 watchdog；不可與 AI queue 共用資源。
+    command: ["php", "artisan", "schedule:work"]
+
+  postgres:
+    build: infra/docker/postgres
+    image: yacs-postgres:dev
+    environment:
+      POSTGRES_PASSWORD: ${YACS_DB_SUPERUSER_PASSWORD:-postgres-dev-only}
+      YACS_DB_OWNER_PASSWORD: ${DB_MIGRATOR_PASSWORD:-owner-dev-only}
+      YACS_DB_RUNTIME_PASSWORD: ${DB_PASSWORD:-runtime-dev-only}
+      YACS_DATABASES: yacs,yacs_test
+    ports: ["${YACS_PG_PORT:-54320}:5432"]
+    volumes: ["pgdata:/var/lib/postgresql"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # 佇列專用 Redis：noeviction + AOF，避免任務被淘汰；DB 仍是任務權威來源。
+  redis-queue:
+    image: redis:8-alpine
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    ports: ["${YACS_REDIS_QUEUE_PORT:-63790}:6379"]
+    volumes: ["redisqueue:/data"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # 快取/限流/presence 用 Redis：可淘汰，與佇列記憶體隔離。
+  redis-cache:
+    image: redis:8-alpine
+    command: ["redis-server", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
+    ports: ["${YACS_REDIS_CACHE_PORT:-63791}:6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # 攔截所有外寄信件（邀請、密碼重設），Web UI: http://localhost:8025
+  mailpit:
+    image: axllent/mailpit:latest
+    ports: ["${YACS_MAILPIT_PORT:-8025}:8025"]
+
+  # S3 相容物件儲存（開發用）；正式環境建議 Cloudflare R2 或其他 S3 相容服務。
+  s3:
+    image: chrislusf/seaweedfs:latest
+    command: ["server", "-s3", "-s3.config=/etc/seaweedfs/s3.json", "-dir=/data"]
+    volumes:
+      - s3data:/data
+      - ./infra/docker/seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro
+    ports: ["${YACS_S3_PORT:-8333}:8333"]
+
+volumes:
+  pgdata:
+  redisqueue:
+  s3data:

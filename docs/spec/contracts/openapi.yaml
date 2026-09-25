@@ -6026,6 +6026,32 @@ paths:
           format: uuid
       - $ref: '#/components/parameters/Cursor'
       - $ref: '#/components/parameters/Limit'
+      - name: action
+        in: query
+        schema:
+          type: string
+          maxLength: 100
+      - name: resource_type
+        in: query
+        schema:
+          type: string
+          maxLength: 64
+      - name: resource_id
+        in: query
+        schema: &id001
+          type: string
+          format: uuid
+      - name: actor_id
+        in: query
+        schema: *id001
+      - name: from
+        in: query
+        schema: &id002
+          type: string
+          format: date-time
+      - name: to
+        in: query
+        schema: *id002
   /api/v1/workspaces/{workspace_id}/reports/summary:
     get:
       operationId: getReportSummary
@@ -6530,6 +6556,445 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/InboundEvent'
+  /api/v1/auth/password/forgot:
+    post:
+      operationId: forgotPassword
+      tags:
+      - Auth
+      summary: Request a password reset email (response is identical whether or not the account exists)
+      security:
+      - CsrfHeader: []
+      responses:
+        '202':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Accepted'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPassword'
+  /api/v1/auth/password/reset:
+    post:
+      operationId: resetPassword
+      tags:
+      - Auth
+      summary: Reset password with a single-use token; revokes all sessions
+      security:
+      - CsrfHeader: []
+      responses:
+        '204':
+          description: Success
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPassword'
+  /api/v1/auth/invitations/lookup:
+    post:
+      operationId: lookupInvitation
+      tags:
+      - Auth
+      summary: Describe a pending staff invitation (token in body, never in URL)
+      security:
+      - CsrfHeader: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/InvitationInfo'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvitationToken'
+  /api/v1/auth/invitations/accept:
+    post:
+      operationId: acceptInvitation
+      tags:
+      - Auth
+      summary: Accept a staff invitation; new users must set a password
+      security:
+      - CsrfHeader: []
+      responses:
+        '204':
+          description: Success
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvitationAccept'
+  /api/v1/me/password:
+    put:
+      operationId: changePassword
+      tags:
+      - Auth
+      summary: Change own password; revokes other sessions
+      security:
+      - StaffSession: []
+        CsrfHeader: []
+      responses:
+        '204':
+          description: Success
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordChange'
+  /api/v1/me/mfa/setup:
+    post:
+      operationId: setupMfa
+      tags:
+      - Auth
+      summary: Start TOTP enrollment
+      security:
+      - StaffSession: []
+        CsrfHeader: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/MfaSetup'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+  /api/v1/me/mfa/confirm:
+    post:
+      operationId: confirmMfa
+      tags:
+      - Auth
+      summary: Confirm TOTP enrollment and receive one-time recovery codes
+      security:
+      - StaffSession: []
+        CsrfHeader: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/RecoveryCodes'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaCode'
+  /api/v1/me/mfa/disable:
+    post:
+      operationId: disableMfa
+      tags:
+      - Auth
+      summary: Disable MFA (requires password and a current code)
+      security:
+      - StaffSession: []
+        CsrfHeader: []
+      responses:
+        '204':
+          description: Success
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaDisable'
+  /api/v1/me/mfa/recovery-codes:
+    post:
+      operationId: regenerateMfaRecoveryCodes
+      tags:
+      - Auth
+      summary: Regenerate recovery codes (old codes become invalid)
+      security:
+      - StaffSession: []
+        CsrfHeader: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/RecoveryCodes'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaCode'
+  /api/v1/workspaces/{workspace_id}/me:
+    get:
+      operationId: getWorkspaceMe
+      tags:
+      - Operations
+      summary: Current membership and effective grants in this workspace (UI hints only; server re-checks every action)
+      security:
+      - StaffSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/WorkspaceMe'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema: *id001
+  /api/v1/workspaces/{workspace_id}/members/{member_id}/role-bindings:
+    get:
+      operationId: getMemberRoleBindings
+      tags:
+      - Operations
+      summary: List role bindings of a member
+      security:
+      - StaffSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/MemberRoleBindings'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema: *id001
+      - name: member_id
+        in: path
+        required: true
+        schema: *id001
+    put:
+      operationId: replaceMemberRoleBindings
+      tags:
+      - Operations
+      summary: Replace role bindings; every added or removed binding must be within the caller's own grants (SEC-005)
+      security:
+      - StaffSession: []
+        CsrfHeader: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/MemberRoleBindings'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '410':
+          $ref: '#/components/responses/CursorExpired'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema: *id001
+      - name: member_id
+        in: path
+        required: true
+        schema: *id001
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MemberRoleBindingsReplace'
 components:
   schemas:
     UUID:
@@ -7491,12 +7956,26 @@ components:
           items:
             type: string
             format: uuid
+        locale:
+          anyOf:
+          - type: string
+          - type: 'null'
+        mfa_enabled:
+          type: boolean
+        mfa_enrollment_required:
+          type: boolean
+          description: 正式環境強制 MFA 且尚未設定時為 true；此時只能使用 /me 與 MFA 設定端點。
+        is_platform_operator:
+          type: boolean
       additionalProperties: false
       required:
       - id
       - name
       - email
       - workspace_ids
+      - mfa_enabled
+      - mfa_enrollment_required
+      - is_platform_operator
     Workspace:
       type: object
       properties:
@@ -7568,6 +8047,7 @@ components:
       - name
       - slug
       - status
+      - theme
     BrandCreate:
       type: object
       properties:
@@ -7666,6 +8146,12 @@ components:
             format: uuid
         public_key:
           type: string
+        business_hours_id: &id003
+          anyOf:
+          - *id001
+          - type: 'null'
+        settings:
+          $ref: '#/components/schemas/InboxSettings'
       additionalProperties: false
       required:
       - id
@@ -7676,6 +8162,12 @@ components:
       - channel_type
       - status
       - ai_mode
+      - allowed_origins
+      - team_ids
+      - public_key
+      - settings
+      - business_hours_id
+      - ai_profile_id
     InboxCreate:
       type: object
       properties:
@@ -7718,6 +8210,9 @@ components:
           items:
             type: string
             format: uuid
+        business_hours_id: *id003
+        settings:
+          $ref: '#/components/schemas/InboxSettings'
       additionalProperties: false
       required:
       - brand_id
@@ -7762,6 +8257,9 @@ components:
         expected_version:
           type: string
           pattern: ^(0|[1-9][0-9]*)$
+        business_hours_id: *id003
+        settings:
+          $ref: '#/components/schemas/InboxSettings'
       additionalProperties: false
       required:
       - expected_version
@@ -7811,6 +8309,9 @@ components:
       - email
       - display_name
       - status
+      - max_active_conversations
+      - inbox_ids
+      - team_ids
     MemberCreate:
       type: object
       properties:
@@ -7908,6 +8409,7 @@ components:
       - version
       - name
       - status
+      - member_ids
     TeamCreate:
       type: object
       properties:
@@ -7976,6 +8478,13 @@ components:
           items:
             type: string
           maxItems: 100
+        description:
+          anyOf:
+          - type: string
+            maxLength: 500
+          - type: 'null'
+        is_system_template:
+          type: boolean
       additionalProperties: false
       required:
       - id
@@ -7984,6 +8493,8 @@ components:
       - key
       - name
       - permission_codes
+      - is_system_template
+      - description
     RoleCreate:
       type: object
       properties:
@@ -7999,6 +8510,11 @@ components:
           items:
             type: string
           maxItems: 100
+        description:
+          anyOf:
+          - type: string
+            maxLength: 500
+          - type: 'null'
       additionalProperties: false
       required:
       - key
@@ -8022,6 +8538,11 @@ components:
         expected_version:
           type: string
           pattern: ^(0|[1-9][0-9]*)$
+        description:
+          anyOf:
+          - type: string
+            maxLength: 500
+          - type: 'null'
       additionalProperties: false
       required:
       - expected_version
@@ -10364,6 +10885,251 @@ components:
         - data
         additionalProperties: false
       description: staff audience projection; validate before broadcasting.
+    InboxSettings:
+      type: object
+      properties:
+        offline_message:
+          anyOf:
+          - type: string
+            maxLength: 500
+          - type: 'null'
+        auto_assign:
+          type: boolean
+        csat_enabled:
+          type: boolean
+        require_verified_for_attachments:
+          type: boolean
+        privacy_notice:
+          anyOf:
+          - type: string
+            maxLength: 1000
+          - type: 'null'
+      additionalProperties: false
+    RoleBinding:
+      type: object
+      properties:
+        role_id: *id001
+        scope_type:
+          type: string
+          enum:
+          - workspace
+          - brand
+          - inbox
+          - team
+        scope_id: *id003
+      additionalProperties: false
+      required:
+      - role_id
+      - scope_type
+      - scope_id
+    MemberRoleBindings:
+      type: object
+      properties:
+        member_id: *id001
+        role_bindings:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoleBinding'
+          maxItems: 50
+      additionalProperties: false
+      required:
+      - member_id
+      - role_bindings
+    MemberRoleBindingsReplace:
+      type: object
+      properties:
+        role_bindings:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoleBinding'
+          maxItems: 50
+      additionalProperties: false
+      required:
+      - role_bindings
+    Grant:
+      type: object
+      properties:
+        permission:
+          type: string
+        scope_type:
+          type: string
+          enum:
+          - workspace
+          - brand
+          - inbox
+          - team
+        scope_id: *id003
+      additionalProperties: false
+      required:
+      - permission
+      - scope_type
+      - scope_id
+    WorkspaceMe:
+      type: object
+      properties:
+        workspace:
+          $ref: '#/components/schemas/Workspace'
+        membership_id: *id001
+        display_name:
+          type: string
+        staff_session_id: *id003
+        permission_codes:
+          type: array
+          items:
+            type: string
+        grants:
+          type: array
+          items:
+            $ref: '#/components/schemas/Grant'
+      additionalProperties: false
+      required:
+      - workspace
+      - membership_id
+      - display_name
+      - staff_session_id
+      - permission_codes
+      - grants
+    MfaSetup:
+      type: object
+      properties:
+        secret:
+          type: string
+          description: Base32 TOTP secret；只在設定當下回傳一次。
+        otpauth_uri:
+          type: string
+      additionalProperties: false
+      required:
+      - secret
+      - otpauth_uri
+    MfaCode:
+      type: object
+      properties:
+        code:
+          type: string
+          pattern: ^[0-9]{6}$
+      additionalProperties: false
+      required:
+      - code
+    MfaDisable:
+      type: object
+      properties:
+        password:
+          type: string
+          maxLength: 1024
+        code:
+          type: string
+          pattern: ^[0-9]{6}$
+      additionalProperties: false
+      required:
+      - password
+      - code
+    RecoveryCodes:
+      type: object
+      properties:
+        recovery_codes:
+          type: array
+          items:
+            type: string
+          minItems: 1
+      additionalProperties: false
+      required:
+      - recovery_codes
+    PasswordChange:
+      type: object
+      properties:
+        current_password:
+          type: string
+          maxLength: 1024
+        password:
+          type: string
+          minLength: 12
+          maxLength: 1024
+      additionalProperties: false
+      required:
+      - current_password
+      - password
+    ForgotPassword:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+      additionalProperties: false
+      required:
+      - email
+    ResetPassword:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        token:
+          type: string
+          minLength: 20
+          maxLength: 200
+        password:
+          type: string
+          minLength: 12
+          maxLength: 1024
+      additionalProperties: false
+      required:
+      - email
+      - token
+      - password
+    Accepted:
+      type: object
+      properties:
+        accepted:
+          type: boolean
+          const: true
+      additionalProperties: false
+      required:
+      - accepted
+    InvitationToken:
+      type: object
+      properties:
+        token:
+          type: string
+          minLength: 20
+          maxLength: 200
+      additionalProperties: false
+      required:
+      - token
+    InvitationInfo:
+      type: object
+      properties:
+        workspace_name:
+          type: string
+        email:
+          type: string
+          format: email
+        requires_password:
+          type: boolean
+        expires_at: *id002
+      additionalProperties: false
+      required:
+      - workspace_name
+      - email
+      - requires_password
+      - expires_at
+    InvitationAccept:
+      type: object
+      properties:
+        token:
+          type: string
+          minLength: 20
+          maxLength: 200
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        password:
+          type: string
+          minLength: 12
+          maxLength: 1024
+      additionalProperties: false
+      required:
+      - token
   securitySchemes:
     StaffSession:
       type: apiKey

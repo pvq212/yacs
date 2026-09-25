@@ -1,0 +1,19 @@
+# 避免機密與大型目錄進入 build context（prod 映像會 COPY . .）。
+.git
+.env
+.env.*
+!.env.example
+tmp
+vendor
+node_modules
+**/node_modules
+public/build
+public/sdk
+public/hot
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+tests/.artifacts
+playwright-report
+test-results

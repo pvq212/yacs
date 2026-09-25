@@ -1,0 +1,9 @@
+{
+  "identities": [
+    {
+      "name": "yacs-dev",
+      "credentials": [{ "accessKey": "yacs-dev-access", "secretKey": "yacs-dev-secret-not-for-production" }],
+      "actions": ["Admin", "Read", "Write", "List", "Tagging"]
+    }
+  ]
+}

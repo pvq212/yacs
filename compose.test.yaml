@@ -1,0 +1,55 @@
+# YACS 測試環境：與開發/正式完全分離的資料庫、Redis 與假 AI 服務。
+# 用法：docker compose -f compose.test.yaml up -d --wait
+#       之後以 .env.testing 的設定執行 php artisan test。
+# 資料放在 tmpfs，容器停止即消失；不得指向任何正式資源。
+
+name: yacs-test
+
+services:
+  postgres:
+    build: infra/docker/postgres
+    image: yacs-postgres:dev
+    environment:
+      POSTGRES_PASSWORD: postgres-test-only
+      YACS_DB_OWNER_PASSWORD: owner-test-only
+      YACS_DB_RUNTIME_PASSWORD: runtime-test-only
+      YACS_DATABASES: yacs_test
+    command: ["postgres", "-c", "fsync=off", "-c", "synchronous_commit=off", "-c", "full_page_writes=off", "-c", "max_connections=200"]
+    tmpfs: ["/var/lib/postgresql:size=2g"]
+    ports: ["${YACS_TEST_PG_PORT:-55432}:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d yacs_test"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  redis:
+    image: redis:8-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no", "--maxmemory-policy", "noeviction"]
+    ports: ["${YACS_TEST_REDIS_PORT:-56379}:6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  # 可控的假 AI 供應商（四種協定 + embedding），供 E2E / 壓測使用。
+  fake-ai:
+    image: yacs-app:dev
+    build:
+      context: .
+      dockerfile: infra/docker/app/Dockerfile
+      target: dev
+    command: ["php", "-S", "0.0.0.0:8090", "infra/fake-ai/server.php"]
+    volumes: [".:/app"]
+    ports: ["${YACS_TEST_FAKE_AI_PORT:-18090}:8090"]
+
+  # 可選：本地模型實機測試（docker compose -f compose.test.yaml --profile ollama up -d）
+  ollama:
+    image: ollama/ollama:latest
+    profiles: ["ollama"]
+    ports: ["${YACS_TEST_OLLAMA_PORT:-11434}:11434"]
+    volumes: ["ollama:/root/.ollama"]
+
+volumes:
+  ollama:

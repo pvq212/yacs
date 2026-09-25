@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  YACS 測試設定。
+  資料庫測試一律使用真實 PostgreSQL（compose.test.yaml），不使用 SQLite。
+  以下 env 皆為測試專用假值；可由外部環境變數覆寫（例如 CI）。
+-->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+         cacheDirectory=".phpunit.cache"
+         executionOrder="default"
+>
+    <testsuites>
+        <testsuite name="Unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Feature">
+            <directory>tests/Feature</directory>
+        </testsuite>
+        <testsuite name="Integration">
+            <directory>tests/Integration</directory>
+        </testsuite>
+        <testsuite name="Concurrency">
+            <directory>tests/Concurrency</directory>
+        </testsuite>
+        <testsuite name="Contract">
+            <directory>tests/Contract</directory>
+        </testsuite>
+        <testsuite name="Live">
+            <directory>tests/Live</directory>
+        </testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory>app</directory>
+        </include>
+    </source>
+    <php>
+        <ini name="memory_limit" value="1G"/>
+        <env name="APP_ENV" value="testing"/>
+        <env name="APP_KEY" value="base64:dGVzdC1vbmx5LWFwcC1rZXktMzItYnl0ZXMtbG9uZyE="/>
+        <env name="APP_URL" value="http://yacs.test"/>
+        <env name="APP_MAINTENANCE_DRIVER" value="file"/>
+        <env name="BCRYPT_ROUNDS" value="4"/>
+        <env name="BROADCAST_CONNECTION" value="null"/>
+        <env name="CACHE_STORE" value="array"/>
+        <env name="DB_CONNECTION" value="pgsql"/>
+        <env name="DB_HOST" value="127.0.0.1"/>
+        <env name="DB_PORT" value="55432"/>
+        <env name="DB_DATABASE" value="yacs_test"/>
+        <env name="DB_USERNAME" value="yacs_runtime"/>
+        <env name="DB_PASSWORD" value="runtime-test-only"/>
+        <env name="DB_MIGRATOR_USERNAME" value="yacs_owner"/>
+        <env name="DB_MIGRATOR_PASSWORD" value="owner-test-only"/>
+        <env name="DB_URL" value=""/>
+        <env name="REDIS_QUEUE_HOST" value="127.0.0.1"/>
+        <env name="REDIS_QUEUE_PORT" value="56379"/>
+        <env name="REDIS_CACHE_HOST" value="127.0.0.1"/>
+        <env name="REDIS_CACHE_PORT" value="56379"/>
+        <env name="REDIS_CACHE_DB" value="1"/>
+        <env name="REDIS_PREFIX" value="yacs-test:"/>
+        <env name="MAIL_MAILER" value="array"/>
+        <env name="QUEUE_CONNECTION" value="sync"/>
+        <env name="SESSION_DRIVER" value="array"/>
+        <env name="FILESYSTEM_DISK" value="local"/>
+        <env name="YACS_FILES_DISK" value="testing"/>
+        <env name="YACS_SECRET_KEY_ID" value="test1"/>
+        <env name="YACS_SECRET_ENCRYPTION_KEY" value="dGVzdC1vbmx5LXNlY3JldC1rZXktMzItYnl0ZXMhIT8="/>
+        <env name="YACS_LOOKUP_DIGEST_KEY" value="dGVzdC1vbmx5LWxvb2t1cC1rZXktMzItYnl0ZXMhISE="/>
+        <env name="YACS_EGRESS_ALLOW_INSECURE_FOR_TESTING" value="true"/>
+    </php>
+</phpunit>

@@ -1,5 +1,38 @@
+# 機密：任何 .env 變體都不進版控（repo 為公開）；範例檔例外。
 .env
 .env.*
 !.env.example
 !.env.testing.example
 /tmp/
+
+# 依賴與產物
+/vendor
+/node_modules
+**/node_modules
+/public/build
+/public/sdk
+/public/hot
+/public/storage
+/storage/*.key
+/storage/pail
+/bootstrap/cache/*.php
+/.phpunit.cache
+.phpunit.result.cache
+/tests/.artifacts
+/playwright-report
+/test-results
+/packages/*/dist
+
+# 編輯器與系統
+*.log
+.DS_Store
+Thumbs.db
+/.idea
+/.vscode
+/.zed
+/.cursor/
+/.codex
+/.nova
+.phpactor.json
+_ide_helper.php
+/auth.json
