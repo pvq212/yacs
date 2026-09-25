@@ -43,7 +43,7 @@ Presence（多分頁session、心跳、available/away）可暫存Redis，但staf
 | contact_identities | workspace_id,brand_id,contact_id,issuer,subject,verified_at | unique(workspace_id,brand_id,issuer,subject)；不能靠email merge |
 | identity_issuers | workspace_id,brand_id,key_id,issuer,inbox_scope,secret_ref,status | issuer+key_id唯一；固定演算法與audience |
 | identity_exchanges | workspace_id,issuer_id,jti_hash,request_hash,session_id,expires_at | unique(issuer_id,jti_hash)，原子consume；若提供冪等response含token則短期加密儲存 |
-| visitor_sessions | workspace_id,brand_id,inbox_id,contact_id,identity_level,token_hash,refresh_hash,expires_at,refresh_expires_at,revoked_at,session_generation | 只能屬於一個brand/inbox；access/refresh分離，rotation有reuse檢查 |
+| visitor_sessions | workspace_id,brand_id,inbox_id,contact_id,identity_level,identity_issuer_id,access_token_hash,access_expires_at,refresh_expires_at,revoked_at,session_generation,context | 只能屬於一個brand/inbox；refresh token只存在visitor_refresh_tokens（ADR-0008） |
 | visitor_refresh_tokens | workspace_id,session_id,family_id,token_hash,replaced_by,used_at,expires_at,revoked_at | hash唯一；保留旋轉歷史以偵測舊token reuse，不只存目前hash |
 | customer_attributes | workspace_id,key,type,visibility,editable_by_visitor,validation_rules | 來源可信等級固定；verified/VIP/餘額不可由visitor修改 |
 | contact_merge_events | workspace_id,brand_id,source_contact_id,target_contact_id,conversation_id,actor_id,reason | 首版只有明確授權的匿名目前對話合併；不跨品牌 |

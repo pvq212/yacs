@@ -1,4 +1,4 @@
-/** SupportDesk SDK v1 contract. Declaration only; no implementation is included. */
+/** YACS SDK v1 contract. Declaration only; no implementation is included. */
 export type UUID = string;
 export type Sequence = string; // Decimal bigint; never coerce to JavaScript Number.
 export type ConnectionState = 'connecting' | 'connected' | 'reconnecting' | 'polling' | 'offline';
@@ -63,7 +63,7 @@ export interface WidgetEvents {
   'identity:changed': { level: 'anonymous' | 'verified' };
   error: SdkError;
 }
-export interface SupportDeskSDK {
+export interface YacsSDK {
   init(options: InitOptions): Promise<void>;
   open(): Promise<void>;
   close(): Promise<void>;
@@ -82,5 +82,5 @@ export interface SupportDeskSDK {
   destroy(): Promise<void>;
 }
 declare global {
-  interface Window { SupportDesk: SupportDeskSDK; }
+  interface Window { Yacs: YacsSDK; }
 }

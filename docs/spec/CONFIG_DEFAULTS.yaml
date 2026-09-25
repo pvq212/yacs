@@ -64,22 +64,35 @@ queues:
   use_redis_cluster: false
   queue_redis_eviction_policy: noeviction
   core:
-    connection: redis_core
+    connection: core
     job_timeout_seconds: 30
     supervisor_timeout_seconds: 40
     retry_after_seconds: 120
     max_attempts: 3
   ai:
-    connection: redis_ai
+    connection: ai
     job_timeout_seconds: 70
     supervisor_timeout_seconds: 80
     retry_after_seconds: 120
     max_attempts: 2
   knowledge:
-    connection: redis_kb
+    connection: kb
     job_timeout_seconds: 240
     supervisor_timeout_seconds: 270
     retry_after_seconds: 330
+    max_attempts: 3
+  # ADR-0015：補齊 events / channels。
+  events:
+    connection: events
+    job_timeout_seconds: 30
+    supervisor_timeout_seconds: 40
+    retry_after_seconds: 120
+    max_attempts: 5
+  channels:
+    connection: channels
+    job_timeout_seconds: 20
+    supervisor_timeout_seconds: 30
+    retry_after_seconds: 90
     max_attempts: 3
   watchdog_interval_seconds: 10
 files:
@@ -95,6 +108,8 @@ files:
     - application/pdf
     - text/plain
   scan_failure_policy: quarantine
+  # ADR-0009：預設 content_validation（不含病毒掃描）。
+  scanner: content_validation
 webhooks:
   signature_algorithm: hmac-sha256
   timestamp_window_seconds: 300

@@ -8,7 +8,7 @@
 
 ## 2. 三種認證
 
-**Staff**：`/ops`與`/agent`同站部署，Laravel session + CSRF（Sanctum/Fortify相容流程）。先GET `/sanctum/csrf-cookie`，再login；MFA challenge完成後才能取得有效session。OpenAPI中cookie `supportdesk_session`為本案配置名稱。所有staff寫入同時需要session及`X-XSRF-TOKEN`；GET不要求CSRF。API操作仍需workspace/membership/Policy。
+**Staff**：`/ops`與`/agent`同站部署，Laravel session + CSRF（自行實作，不依賴 Sanctum，見 ADR-0006）。先GET `/api/v1/auth/csrf-cookie`，再login；MFA challenge完成後才能取得有效session。OpenAPI中cookie `yacs_session`為本案配置名稱。所有staff寫入同時需要session及`X-XSRF-TOKEN`；GET不要求CSRF。API操作仍需workspace/membership/Policy。
 
 **Visitor**：公開inbox_key bootstrap匿名session，或以宿主後端簽發的identity JWT交換。Authorization Bearer token只能存取自己brand/inbox/contact/session的資料。Refresh不以staff cookie運作。
 

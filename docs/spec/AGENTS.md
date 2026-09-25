@@ -1,6 +1,6 @@
 # 本地 AI 開發代理工作規則
 
-此資料夾是**規格文件包**，不是既有應用。專案暫名SupportDesk；實作語言PHP/TypeScript，核心技術固定Laravel、PostgreSQL/pgvector、Redis/Horizon、Reverb。
+此資料夾是**規格文件包**，不是既有應用。專案暫名YACS；實作語言PHP/TypeScript，核心技術固定Laravel、PostgreSQL/pgvector、Redis/Horizon、Reverb。
 
 ## 必讀與工作順序
 

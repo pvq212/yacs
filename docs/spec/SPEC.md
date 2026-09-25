@@ -1,8 +1,10 @@
-# 自架 AI 客服平台｜產品與技術規格書
+# YACS 自架 AI 客服平台｜產品與技術規格書
+
+> 本文件源自規格包 v1.0.0，已依 `docs/adr/` 的決策修訂；與原版差異見 `CHANGELOG.md`。
 
 **文件版本：1.0.0**  
 **基準日期：2026-09-26（Asia/Taipei）**  
-**專案暫名：SupportDesk**  
+**專案名稱：YACS（Yet Another Customer Service）**  
 **技術基線：Laravel + PostgreSQL / pgvector + Redis / Horizon + Reverb**  
 **用途：交付本地 AI coding agent，分階段實作及驗收。這是開發規格，不是已完成的系統或效能保證。**
 
@@ -24,8 +26,12 @@
 | PHP / Laravel | 新專案以 PHP 8.4、Laravel 13.x 為基線；建立專案時鎖定經 CI 驗證的修補版，不使用浮動 latest [R01] |
 | 前端 | Vue 3 + TypeScript + Vite；客服與運營後台共用元件，widget 獨立 build |
 | UI 傳輸 | 後台同站 session；業務讀寫 REST API；即時通知使用 Reverb；斷線以 HTTP 補資料 |
-| 資料庫 | PostgreSQL 18.x 作為選定基線；採與部署環境相容且經驗證的 pgvector 修補版 |
-| 非同步 | Redis 非 Cluster 佇列 + Horizon；權威任務紀錄仍保存在 PostgreSQL |
+| 資料庫 | PostgreSQL 18.x + pgvector + PGroonga（自建映像）；migration 與 runtime 角色分離並啟用 RLS（ADR-0004） |
+| 非同步 | Redis 非 Cluster 佇列 + Horizon；權威任務紀錄仍保存在 PostgreSQL（ADR-0003） |
+| 執行環境 | Laravel Octane + FrankenPHP；Reverb、Horizon、scheduler 為獨立程序（ADR-0005） |
+| 物件儲存 | S3 相容 API；正式環境 Cloudflare R2，開發用 SeaweedFS（ADR-0007） |
+| 中文檢索 | PGroonga + FAQ 關鍵字，pg_trgm 為備援（ADR-0010） |
+| 授權 | 主程式 AGPL-3.0-only；widget SDK 與 examples 採 MIT（ADR-0002） |
 | AI | 第一版可完全關閉；啟用時經自有介面接入 Laravel AI SDK，必要時換原生/維護中客戶端 |
 | 檢索 | 自建文件、chunks、embeddings；不把知識庫必然綁在模型供應商的檔案搜尋服務 |
 | UI 語言 | 預設繁體中文；文字抽出 i18n，預留簡體中文與英文 |
@@ -161,7 +167,7 @@ F-WEB-008：WCAG 2.2 AA 作為 UI 驗收目標：鍵盤開關、focus trap/retur
 
 1. `inbox_key` 是公開識別碼，不是 API key；host origin allowlist 只限制嵌入環境，不能替代身分認證或抗濫用。
 2. 宿主後端根據自己的已登入 session 產生 JWT。允許演算法固定 HS256；採維護中的 JWT 函式庫，不自行實作簽章。金鑰至少 256-bit 隨機值，具有 `kid` 且可輪換 [R14]。
-3. Claims 至少含 `iss`、`aud="supportdesk:visitor"`、`sub`、`workspace_id`、`brand_id`、`inbox_key`、`iat`、`exp`、`jti`；有效期預設 60 秒，時鐘誤差最多 30 秒。伺服器將 issuer/key 綁到正確 workspace/brand/inbox，不能只相信 payload。
+3. Claims 至少含 `iss`、`aud="yacs:visitor"`、`sub`、`workspace_id`、`brand_id`、`inbox_key`、`iat`、`exp`、`jti`；有效期預設 60 秒，時鐘誤差最多 30 秒。伺服器將 issuer/key 綁到正確 workspace/brand/inbox，不能只相信 payload。
 4. `jti` 以 DB 原子唯一約束執行一次性交換。同一請求的安全重試需由 idempotency 紀錄識別；不能為了網路重試取消 replay 防護。
 5. 交換出的 visitor token 15 分鐘有效，限制到 contact + brand + inbox + session；refresh token 不透明、旋轉、DB 僅存 hash，最長閒置 24 小時。member refresh 必須受宿主 logout/revocation 流程控制，不能當成永久登入。
 6. `logout` 必須撤銷訪客 session、清除草稿/記憶體/本地 resume token、關閉舊 socket，再以新匿名 session 重建；不能只改畫面姓名。
@@ -173,7 +179,7 @@ F-WEB-008：WCAG 2.2 AA 作為 UI 驗收目標：鍵盤開關、focus trap/retur
 
 ### 04.3 SDK 發佈
 
-提供固定版本路徑 `/sdk/v1.0.0/supportdesk.js`、major alias `/sdk/v1/supportdesk.js` 與 NPM package（有需要才發佈）。正式建議鎖固定版本與 SRI；hash 在 build 時產生，不寫假值。CDN 只快取公開 loader/assets，不快取私人 API/對話/附件。
+提供固定版本路徑 `/sdk/v1.0.0/yacs.js`、major alias `/sdk/v1/yacs.js` 與 NPM package（有需要才發佈）。正式建議鎖固定版本與 SRI；hash 在 build 時產生，不寫假值。CDN 只快取公開 loader/assets，不快取私人 API/對話/附件。
 
 ---
 
@@ -443,7 +449,7 @@ Automation Integration：Webhook、n8n/Make 類自動化、內部通知；只依
 
 事件包括 `conversation.created`、`conversation.handoff_requested`、`conversation.assigned`、`conversation.resolved`、`conversation.reopened`、`message.created`、`message.delivery_updated`、`knowledge.published`、`ai.run.failed`。
 
-Header：`X-SupportDesk-Event-Id`、`X-SupportDesk-Timestamp`、`X-SupportDesk-Key-Id`、`X-SupportDesk-Signature`。簽章原文為 `timestamp + "." + raw_body`，HMAC-SHA256 hex，header 形式 `v1=<hex>`；receiver 以 constant-time 比較，接受時間窗預設 ±300 秒並以 event_id 去重。
+Header：`X-Yacs-Event-Id`、`X-Yacs-Timestamp`、`X-Yacs-Key-Id`、`X-Yacs-Signature`。簽章原文為 `timestamp + "." + raw_body`，HMAC-SHA256 hex，header 形式 `v1=<hex>`；receiver 以 constant-time 比較，接受時間窗預設 ±300 秒並以 event_id 去重。
 
 投遞需 durable outbox，預設重試 30s/2m/10m/1h/6h/24h，使用 jitter，最多 10 次；401/403 應告警暫停，429 尊重 Retry-After。每次重送重新產生 timestamp/signature、保持 event_id/body 語意不變。手動重送需 audit。
 

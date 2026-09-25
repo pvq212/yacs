@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://supportdesk.example/spec/public-realtime-event.schema.json",
-  "title": "SupportDesk public durable event",
+  "$id": "https://yacs.example/spec/public-realtime-event.schema.json",
+  "title": "YACS public durable event",
   "oneOf": [
     {
       "type": "object",

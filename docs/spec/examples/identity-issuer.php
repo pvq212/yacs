@@ -11,7 +11,7 @@ declare(strict_types=1);
  */
 use Firebase\JWT\JWT;
 
-function issueSupportDeskIdentity(
+function issueYacsIdentity(
     string $authenticatedSubject,
     string $issuer,
     string $workspaceId,
@@ -37,7 +37,7 @@ function issueSupportDeskIdentity(
     $now = time();
     return JWT::encode([
         'iss' => $issuer,
-        'aud' => 'supportdesk:visitor',
+        'aud' => 'yacs:visitor',
         'sub' => $authenticatedSubject,
         'workspace_id' => $workspaceId,
         'brand_id' => $brandId,

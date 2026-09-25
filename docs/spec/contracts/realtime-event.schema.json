@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "SupportDesk durable event (select audience-specific validator in application)",
+  "title": "YACS durable event (select audience-specific validator in application)",
   "anyOf": [
     {
       "$ref": "public-realtime-event.schema.json"

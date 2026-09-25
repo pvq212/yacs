@@ -1,19 +1,19 @@
 <!doctype html>
 <html lang="zh-Hant">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SupportDesk 嵌入契約示例</title></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>YACS 嵌入契約示例</title></head>
 <body>
   <h1>網站客服嵌入示例</h1>
   <p>此頁是未實作 SDK 的使用契約；必須先完成本規格中的後端與 SDK，再替換域名和 inbox key。</p>
   <p id="status" role="status"></p>
   <!-- Fixed version URL. Add build-generated SRI and CSP nonce in production. -->
-  <script src="https://support.example.com/sdk/v1.0.0/supportdesk.js" defer></script>
+  <script src="https://yacs.example.com/sdk/v1.0.0/yacs.js" defer></script>
   <script>
     window.addEventListener('load', async () => {
       const status = document.getElementById('status');
       try {
-        if (!window.SupportDesk) throw new Error('SDK 尚未實作或載入失敗');
-        await window.SupportDesk.init({
-          baseUrl: 'https://support.example.com',
+        if (!window.Yacs) throw new Error('SDK 尚未實作或載入失敗');
+        await window.Yacs.init({
+          baseUrl: 'https://yacs.example.com',
           inboxKey: 'REPLACE_WITH_PUBLIC_INBOX_KEY',
           mode: 'bubble',
           position: 'bottom-right',
@@ -21,9 +21,9 @@
           context: { path: window.location.pathname },
           // Omit identityTokenProvider for anonymous-only mode.
           identityTokenProvider: async () => {
-            // This endpoint belongs to YOUR WEBSITE backend, not to SupportDesk.
+            // This endpoint belongs to YOUR WEBSITE backend, not to YACS.
             // It must authenticate the actual member and mint a short-lived assertion.
-            const response = await fetch('/api/supportdesk/identity-token', {
+            const response = await fetch('/api/yacs/identity-token', {
               method: 'GET',
               credentials: 'same-origin',
               cache: 'no-store',
@@ -35,7 +35,7 @@
             return body.token;
           }
         });
-        window.SupportDesk.on('error', ({ code }) => {
+        window.Yacs.on('error', ({ code }) => {
           // Do not log tokens, full response bodies or private message text.
           status.textContent = `客服連線狀態：${code}`;
         });
@@ -44,7 +44,7 @@
       }
     });
     // Your host application's successful logout flow MUST also await:
-    // await window.SupportDesk.logout();
+    // await window.Yacs.logout();
     // Do not place provider API keys or the identity signing secret in this page.
   </script>
 </body>
