@@ -1,0 +1,2257 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SupportDesk 自架AI客服｜開發規格 v1.0</title><style>
+:root{--ink:#172b43;--muted:#526579;--accent:#087f8c;--line:#dce5ec;--paper:#fff;--bg:#f3f6fa;--code:#102439}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:30px}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans CJK TC","Microsoft JhengHei",sans-serif;line-height:1.85;font-size:16px}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}.sidebar{position:fixed;left:0;top:0;bottom:0;width:248px;padding:28px 20px;background:#102439;color:#e9f1f8;overflow:auto}.brand{font-weight:800;font-size:24px;letter-spacing:-.5px}.subbrand{font-size:12px;color:#adc1d1;margin:4px 0 30px}.sidebar nav a{display:block;padding:10px 6px;color:#dce9f1;font-size:14px;line-height:1.5;border-bottom:1px solid #254158}.sidebar nav span{display:inline-block;width:28px;color:#77c5ca;font-size:11px}.sidebar .foot{font-size:12px;color:#adc1d1;margin-top:24px}
+main{margin-left:248px;padding:42px 40px 80px;max-width:1510px}.cover{background:linear-gradient(115deg,#17354e,#0e5d69);color:#fff;padding:46px;border-radius:16px;margin-bottom:34px;box-shadow:0 10px 30px #18304712}.cover .label{font-size:12px;letter-spacing:2px;color:#a6e3e3;font-weight:700}.cover h1{font-size:38px;line-height:1.3;margin:16px 0;color:white;border:0}.cover p{max-width:820px;color:#dbeaf1}.pill{display:inline-block;font-size:12px;padding:4px 12px;margin:0 6px 8px 0;border:1px solid #ffffff50;border-radius:100px}.stats{display:flex;gap:20px;margin-top:26px;flex-wrap:wrap}.stat{background:#ffffff10;border:1px solid #ffffff25;padding:14px 22px;border-radius:10px;min-width:155px}.stat strong{display:block;font-size:29px;line-height:1.2}.stat span{font-size:13px;color:#c9e2ea}.cover .note{font-size:13px;color:#c4dae5;margin-bottom:0}
+.document{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:34px 42px;margin:0 0 30px;box-shadow:0 3px 13px #17334c05;overflow-wrap:anywhere}.eyebrow{font-size:11px;letter-spacing:1.4px;font-weight:700;color:var(--accent);text-transform:uppercase}h1{font-size:28px;line-height:1.45;margin:10px 0 22px}h2{font-size:22px;margin:42px 0 16px;padding-top:16px;border-top:1px solid var(--line);line-height:1.5}h3{font-size:18px;line-height:1.5;margin:26px 0 12px}h4{font-size:16px}p{margin:12px 0}strong{font-weight:750}hr{border:0;border-top:1px solid var(--line);margin:32px 0}.table-wrap{overflow-x:auto;margin:20px 0;border:1px solid var(--line);border-radius:8px}table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.65}th{background:#eaf2f7;text-align:left;font-weight:750}th,td{border-bottom:1px solid var(--line);padding:12px 14px;vertical-align:top;min-width:110px}tr:last-child td{border-bottom:0}tr:nth-child(even) td{background:#f8fafc}td:first-child{font-weight:550}pre{background:var(--code);color:#e2edf5;padding:22px;border-radius:9px;line-height:1.65;overflow-x:auto;font-size:13px}code{font-family:ui-monospace,SFMono-Regular,Consolas,"Noto Sans Mono CJK TC",monospace;font-size:.9em;background:#eaf1f6;border-radius:4px;padding:2px 5px;color:#174e66}pre code{background:none;padding:0;color:inherit;font-size:1em}blockquote{border-left:4px solid var(--accent);margin:20px 0;padding:4px 20px;background:#f0f8f9}li{margin:7px 0}.backtop{position:fixed;right:20px;bottom:18px;background:#fff;border:1px solid var(--line);border-radius:100px;padding:8px 15px;box-shadow:0 3px 10px #0001;font-size:13px}
+@media(max-width:1000px){.sidebar{position:static;width:auto;max-height:none;padding:18px 24px}.sidebar nav{display:flex;flex-wrap:wrap;gap:4px}.sidebar nav a{font-size:12px;padding:6px 10px;border:1px solid #345269;border-radius:6px}.sidebar .subbrand{margin-bottom:14px}.sidebar .foot{display:none}main{margin:0;padding:20px}.cover{padding:28px}.cover h1{font-size:30px}.document{padding:24px}h1{font-size:25px}body{font-size:15px}.stats{gap:8px}.stat{padding:12px;min-width:125px}}
+@media print{body{background:#fff;font-size:10.5pt}.sidebar,.backtop{display:none}main{margin:0;padding:0;max-width:none}.cover{background:#17354e!important;color:white;break-after:page}.document{border:0;box-shadow:none;padding:0;break-before:page}h2,h3{break-after:avoid}.table-wrap{overflow:visible}table{font-size:9pt}pre{white-space:pre-wrap;overflow-wrap:anywhere}a{color:inherit}}
+</style></head><body id="top"><aside class="sidebar"><div class="brand">SupportDesk</div><div class="subbrand">SELF-HOSTED SUPPORT · SPEC 1.0</div><nav><a href="#doc-readme"><span>01</span>開始使用</a><a href="#doc-spec"><span>02</span>產品與技術主規格</a><a href="#doc-data"><span>03</span>資料模型與一致性</a><a href="#doc-ai"><span>04</span>AI供應商與檢索</a><a href="#doc-api"><span>05</span>API與串接契約</a><a href="#doc-tests"><span>06</span>85個驗收案例</a><a href="#doc-plan"><span>07</span>分階段實作計畫</a><a href="#doc-agents"><span>08</span>本地AI工作規則</a><a href="#doc-qa"><span>09</span>文件檢查報告</a><a href="#doc-refs"><span>10</span>官方參考資料</a></nav><div class="foot">2026-09-26<br>Laravel · PostgreSQL · Redis<br>開發規格，不是完成的應用。</div></aside><main><header class="cover"><div class="label">PRODUCT & ENGINEERING SPECIFICATION</div><h1>自架 AI 客服平台<br>從人工接待到知識庫 AI</h1><p>網站 JS SDK 與漂浮泡泡、客服工作台、運營權限與知識管理，共用一套可自架、可替換模型、可擴充渠道的 Laravel 架構。</p><div><span class="pill">Laravel</span><span class="pill">PostgreSQL / pgvector</span><span class="pill">Redis / Horizon</span><span class="pill">Reverb</span><span class="pill">Vue / TypeScript</span></div><div class="stats"><div class="stat"><strong>124</strong><span>核心 API 操作契約</span></div><div class="stat"><strong>85</strong><span>待實作驗收案例</span></div><div class="stat"><strong>M0 → M3</strong><span>分階段交付與閘門</span></div></div><p class="note">本頁整合主規格與附錄；OpenAPI、JSON Schema、SDK 型別及機器可讀測試需求請使用完整 ZIP 文件包。數字代表設計範圍，不是應用功能已通過的測試結果。</p></header><section class="document" id="doc-readme"><div class="eyebrow">README.md</div><h1 id="readme-heading-1">SupportDesk｜交給本地 AI 的開發規格包</h1>
+<p><strong>版本1.0.0 · 2026-09-26 · 繁體中文</strong></p>
+<p>本包定義一套Laravel + PostgreSQL/pgvector + Redis/Horizon + Reverb的自架客服。涵蓋網站JS SDK/漂浮泡泡、會員前台、客服工作台、運營後台、RAG與AI供應商抽象、通用API/Webhook與後續渠道。</p>
+<p><strong>這不是已完成應用。</strong> 不包含可直接部署的Laravel專案、真實API keys或已通過生產測試的聲明。OpenAPI是設計契約；SDK是TypeScript型別宣告與使用示例，並非SDK實作。</p>
+<h2 id="readme-heading-2">檔案與閱讀順序</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+  <th>檔案</th>
+  <th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>READABLE_SPEC.html</td>
+  <td>可離線瀏覽的整合閱讀版；機器可讀契約請使用完整文件包</td>
+</tr>
+<tr>
+  <td>SPEC.md</td>
+  <td>主規格：產品、三端功能、流程、安全、部署與完成定義</td>
+</tr>
+<tr>
+  <td>DATA_MODEL.md</td>
+  <td>領域資料表、FK/唯一鍵、索引、狀態/併發與向量版本</td>
+</tr>
+<tr>
+  <td>AI_ADAPTERS.md</td>
+  <td>Chat/Embedding/Rerank、四種API協定、SDK選用、timeout/fallback/tools</td>
+</tr>
+<tr>
+  <td>API_CONTRACT.md</td>
+  <td>認證、HTTP/SDK/即時事件、冪等、Webhook及待展開管理細項</td>
+</tr>
+<tr>
+  <td>contracts/openapi.yaml</td>
+  <td>核心API：94條path、124個操作、106個schemas；不是所有後續渠道的全量API</td>
+</tr>
+<tr>
+  <td>contracts/openapi.json</td>
+  <td>相同API的JSON形式</td>
+</tr>
+<tr>
+  <td>contracts/widget-sdk.d.ts</td>
+  <td>SDK方法、事件與型別契約</td>
+</tr>
+<tr>
+  <td>contracts/*realtime-event.schema.json</td>
+  <td>公開/內部即時事件JSON Schema；public必須用public validator</td>
+</tr>
+<tr>
+  <td>CONFIG_DEFAULTS.yaml</td>
+  <td>身分、容量、AI、RAG、佇列、附件、Webhook及保留預設</td>
+</tr>
+<tr>
+  <td>ACCEPTANCE_TESTS.md</td>
+  <td>85個Given/When/Then驗收案例，涵蓋權限、競態、故障與前端</td>
+</tr>
+<tr>
+  <td>acceptance-tests.yaml</td>
+  <td>同一份測試需求的機器可讀版本，不是測試程式</td>
+</tr>
+<tr>
+  <td>IMPLEMENTATION_PLAN.md</td>
+  <td>M0→M1純人工→M2 AI→M3生產化的工作清單與閘門</td>
+</tr>
+<tr>
+  <td>AGENTS.md</td>
+  <td>本地coding agent必讀工作規則</td>
+</tr>
+<tr>
+  <td>examples/</td>
+  <td>嵌入頁、合法public event範例、宿主後端簽發函式示例</td>
+</tr>
+<tr>
+  <td>.env.example</td>
+  <td>待實作應用的參數示例，不是現成部署設定</td>
+</tr>
+<tr>
+  <td>REFERENCES.md</td>
+  <td>官方依據、查核日期與未驗證界線</td>
+</tr>
+<tr>
+  <td>tools/validate_specs.py</td>
+  <td>文件/契約一致性檢查，不代替應用測試</td>
+</tr>
+<tr>
+  <td>DOCUMENT_QA.md</td>
+  <td>本文件包實際檢查結果與未檢查項目</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="readme-heading-3">直接給本地AI的啟動指令</h2>
+<pre><code class="language-text">請把這份文件包視為開發規格，不是現有程式。
+先讀 AGENTS.md、SPEC.md、DATA_MODEL.md、AI_ADAPTERS.md、API_CONTRACT.md，
+再讀 contracts/openapi.yaml、ACCEPTANCE_TESTS.md 與 IMPLEMENTATION_PLAN.md。
+
+先檢查目標repo與既有變更，不覆寫我的工作。
+依 M0 開始建立可執行專案、真實PostgreSQL/Redis測試環境與CI，
+再完成M1純人工客服；M1通過後才做M2知識庫AI與M3通用串接/生產化。
+
+務必實作資料隔離、訊息冪等、outbox、任務lease fencing、
+人工接手後AI不得發布、知識版本與Embedding隔離。
+供應商API用自有adapter包住現成SDK，不要在業務Controller寫vendor判斷。
+
+每個task都補migration、Policy、DTO、OpenAPI與測試。
+未定義的管理細項API先補contract再實作。
+每階段回報實際執行的命令/結果、未驗證的外部服務與已知限制。
+不要用假測試結果或空成功回應宣稱完成；未有API key時用fixture並標明未實機驗證。
+</code></pre>
+<h2 id="readme-heading-4">首版與後續範圍</h2>
+<p>M0–M3合起來是第一版正式試營運範圍。首版支持Web/hosted page/generic API/Webhook及可選AI；LINE、Telegram、Email列P2；WhatsApp/Messenger/Instagram、SSO、MCP、OCR等列P3或按需求提前，均需獨立完整驗收。</p>
+<p>省略微服務、Dify、獨立向量資料庫與自主多Agent是刻意的架構決策。先以一個Laravel專案提供三個UI入口；AI慢工作、文件索引、事件/渠道投遞以不同worker/supervisor隔離資源。</p>
+</section><section class="document" id="doc-spec"><div class="eyebrow">SPEC.md</div><h1 id="spec-heading-1">自架 AI 客服平台｜產品與技術規格書</h1>
+<p><strong>文件版本：1.0.0</strong><br />
+<strong>基準日期：2026-09-26（Asia/Taipei）</strong><br />
+<strong>專案暫名：SupportDesk</strong><br />
+<strong>技術基線：Laravel + PostgreSQL / pgvector + Redis / Horizon + Reverb</strong><br />
+<strong>用途：交付本地 AI coding agent，分階段實作及驗收。這是開發規格，不是已完成的系統或效能保證。</strong></p>
+<hr />
+<h2 id="spec-heading-2">00. 文件使用方式與決策基線</h2>
+<p>先讀本文件，再依序讀 <code>DATA_MODEL.md</code>、<code>AI_ADAPTERS.md</code>、<code>API_CONTRACT.md</code>、<code>contracts/openapi.yaml</code>、<code>ACCEPTANCE_TESTS.md</code>、<code>IMPLEMENTATION_PLAN.md</code>。<code>AGENTS.md</code> 是 coding agent 的工作規則；<code>contracts/widget-sdk.d.ts</code> 是瀏覽器 SDK 的型別契約。</p>
+<p>本文件定義產品行為與安全不變量；資料字典定義儲存與約束；OpenAPI 定義首版核心 HTTP 契約。發現衝突時，先修正文檔並留下 ADR（架構決策紀錄），不得由實作者默默選擇對自己最方便的解釋。API 契約中尚未收錄的管理 CRUD 必須在開發該功能之前補齊 request / response schema；不能拿泛用 JSON 當作整個系統的最終 API 定義。</p>
+<h3 id="spec-heading-3">00.1 已選定的預設</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+  <th>項目</th>
+  <th>本案決策</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>產品型態</td>
+  <td>單一公司自架，多品牌、多網站、多收件匣；資料層從第一天有 workspace 隔離</td>
+</tr>
+<tr>
+  <td>多租戶</td>
+  <td>首版可配置多 workspace 並測試隔離；不做公開註冊、方案訂閱、計費 SaaS</td>
+</tr>
+<tr>
+  <td>後端</td>
+  <td>模組化單體 Laravel，不先拆 Go / Python 微服務</td>
+</tr>
+<tr>
+  <td>PHP / Laravel</td>
+  <td>新專案以 PHP 8.4、Laravel 13.x 為基線；建立專案時鎖定經 CI 驗證的修補版，不使用浮動 latest [R01]</td>
+</tr>
+<tr>
+  <td>前端</td>
+  <td>Vue 3 + TypeScript + Vite；客服與運營後台共用元件，widget 獨立 build</td>
+</tr>
+<tr>
+  <td>UI 傳輸</td>
+  <td>後台同站 session；業務讀寫 REST API；即時通知使用 Reverb；斷線以 HTTP 補資料</td>
+</tr>
+<tr>
+  <td>資料庫</td>
+  <td>PostgreSQL 18.x 作為選定基線；採與部署環境相容且經驗證的 pgvector 修補版</td>
+</tr>
+<tr>
+  <td>非同步</td>
+  <td>Redis 非 Cluster 佇列 + Horizon；權威任務紀錄仍保存在 PostgreSQL</td>
+</tr>
+<tr>
+  <td>AI</td>
+  <td>第一版可完全關閉；啟用時經自有介面接入 Laravel AI SDK，必要時換原生/維護中客戶端</td>
+</tr>
+<tr>
+  <td>檢索</td>
+  <td>自建文件、chunks、embeddings；不把知識庫必然綁在模型供應商的檔案搜尋服務</td>
+</tr>
+<tr>
+  <td>UI 語言</td>
+  <td>預設繁體中文；文字抽出 i18n，預留簡體中文與英文</td>
+</tr>
+<tr>
+  <td>時間</td>
+  <td>DB 使用 UTC <code>timestamptz</code>；營業時間與畫面預設 Asia/Taipei，可按 workspace 設定</td>
+</tr>
+<tr>
+  <td>首版渠道</td>
+  <td>Web widget、獨立客服頁、通用伺服器 API、通用入站/出站 Webhook</td>
+</tr>
+<tr>
+  <td>前台 AI 顯示</td>
+  <td>預設先顯示「正在整理回覆」，通過檢查後一次發布完整答案；不先把未驗證 token 串給會員</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>穩定原則：AI、向量索引、推送或第三方渠道故障，不得破壞已落地的人工客服訊息。</strong> 不承諾單機高可用；人工服務也依賴 PostgreSQL 與正常運作的應用程序。</p>
+<h3 id="spec-heading-4">00.2 本文用語</h3>
+<p>MUST / 必須：首版必須完成。SHOULD / 建議：可用 ADR 說明替代設計。P2 / P3：後續擴充，不可冒充首版已支援。所有容量、逾時與品質數字都是本案起始設定或驗收目標，不是套件能力的實測聲明。</p>
+<hr />
+<h2 id="spec-heading-5">01. 目標、角色與範圍</h2>
+<h3 id="spec-heading-6">01.1 核心目標</h3>
+<p>讓會員/訪客從網站的漂浮泡泡發起對話，AI 可依核准知識回答；無答案、要求人工、超時或政策限制時，轉入人工佇列。客服可接單、回答、留言、轉派、結案與重新開案。運營人員可管理知識、AI 設定、網站、座席、權限與稽核。</p>
+<p>系統必須具備可重送訊息、可重連、可追查、可替換 AI 模型/供應商、可新增渠道的能力。UI 不能顯示成功但訊息尚未持久化。</p>
+<h3 id="spec-heading-7">01.2 領域層級</h3>
+<p><code>Workspace（公司/租戶） → Brand（品牌） → Inbox（網站或渠道收件匣） → Conversation（對話） → Message（訊息）</code>。</p>
+<p>Contact（客戶）在首版限定於 workspace + brand；同一自然人在不同品牌可有不同 Contact，禁止依同名、同 Email 自動合併。Staff User 可加入多 workspace，但每次請求只在一個明確、經授權的 workspace context 中執行。</p>
+<h3 id="spec-heading-8">01.3 功能邊界</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+  <th>里程碑</th>
+  <th>包含</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>M0 基礎</td>
+  <td>版本鎖定、Docker 開發環境、權限、隔離、資料表、測試及 CI</td>
+</tr>
+<tr>
+  <td>M1 純人工閉環</td>
+  <td>運營基本設定、客服工作台、widget、身分、訊息、接單/轉派/結案、Reverb/重連、附件</td>
+</tr>
+<tr>
+  <td>M2 AI + 知識</td>
+  <td>FAQ/Markdown/TXT/文字型 PDF、版本發布、檢索、AI adapter、人機交接、評測、成本與停用</td>
+</tr>
+<tr>
+  <td>M3 首版生產化</td>
+  <td>通用 API/Webhook、故障恢復、備份還原、監控、壓測、安全驗收</td>
+</tr>
+<tr>
+  <td>P2 優先渠道</td>
+  <td>LINE、Telegram、Email；每個渠道獨立驗收，不只是填一個 token</td>
+</tr>
+<tr>
+  <td>P3 擴充</td>
+  <td>WhatsApp、Messenger、Instagram、OIDC/SAML SSO、CRM connector、MCP、進階 SLA/排班、語音與 OCR</td>
+</tr>
+</tbody>
+</table></div>
+<p>首版正式試營運定義為 M0–M3 全部通過；M1 可作為受控人工試用。首版不含付款/退款/轉帳的 AI 自動執行、不含任意 SQL/任意程式工具、不含所有社群平台一次接完、不含多 Agent 自主處理工作流程。</p>
+<hr />
+<h2 id="spec-heading-9">02. 系統架構與模組</h2>
+<h3 id="spec-heading-10">02.1 部署單元</h3>
+<pre><code class="language-text">網站 / WebView / 獨立客服頁          運營後台 / 客服工作台
+              │                              │
+              └────── HTTPS / REST ──────────┘
+                              │
+                        Laravel 應用
+       ┌──────────────────────┼────────────────────────┐
+       │                      │                        │
+ PostgreSQL + pgvector    Redis + Horizon         私有物件儲存
+ 訊息 / 權限 / 知識 /      core / ai / kb /        文件 / 附件
+ 任務與事件 / 稽核        events / channels
+       │                      │
+       └──── Transactional Outbox ── Reverb ── WebSocket
+                              │
+                         Provider Adapter
+                    OpenAI / Claude / Gemini /
+                       相容 API / 本地模型
+</code></pre>
+<p>Reverb 是低延遲傳送管道，不是聊天紀錄資料庫。它提供事件迴圈與橫向擴展能力，但重連補資料、事件權限與重複處理是本案應用邏輯 [R03]。</p>
+<h3 id="spec-heading-11">02.2 程式模組</h3>
+<p><code>Identity</code>、<code>Workspaces</code>、<code>AccessControl</code>、<code>Contacts</code>、<code>Conversations</code>、<code>Assignment</code>、<code>Messages</code>、<code>Knowledge</code>、<code>Ai</code>、<code>Channels</code>、<code>Integrations</code>、<code>Notifications</code>、<code>Audit</code>、<code>Reporting</code>、<code>Files</code>、<code>Operations</code>。</p>
+<p>採 Controller → FormRequest/Policy → Application Action → Domain Service → Model/Query 的分層。不是每張資料表都包一層沒有功能的 Repository；只在外部 AI、渠道、儲存、搜尋或需要替換的位置設 interface。</p>
+<p>瀏覽器送進來的 workspace_id、brand_id、contact_id、角色、餘額、VIP、是否已驗證等，不得直接當成授權事實。</p>
+<h3 id="spec-heading-12">02.3 長駐程序限制</h3>
+<p>可以部署於既有 Octane / RoadRunner / FrankenPHP，但先用整合測試證明跨請求 context、credentials、locale 不殘留。不可把目前 workspace、使用者、AI provider key 放入可跨請求共用的 singleton/global 狀態。一般 HTTP worker 不同步等待完整模型答案；AI 工作交給專用 queue。</p>
+<hr />
+<h2 id="spec-heading-13">03. 前台：網站與會員客服</h2>
+<h3 id="spec-heading-14">03.1 顯示形態</h3>
+<p>F-WEB-001：支援右下/左下漂浮泡泡、嵌入指定 DOM 容器、獨立客服頁三種模式。桌面建議寬 380px / 高 620px，手機可切全螢幕並避開安全區與軟鍵盤；尺寸為可調設計值。</p>
+<p>F-WEB-002：泡泡顯示未讀數、營業狀態與歡迎文案，可配置主色、標誌、客服稱呼、語言、位置和隱私說明。品牌設定只能採白名單 CSS token，不接受任意 JS 或 HTML。</p>
+<p>F-WEB-003：前台包括歡迎/FAQ、目前對話、歷史對話、離線留言、檔案上傳、滿意度評分與明確「轉人工」入口。輸入框提供發送狀態、重試、附件狀態；IME 組字未完成時 Enter 不得誤送。</p>
+<p>F-WEB-004：首版用跨來源 iframe 隔離宿主網站樣式；輕量 JS loader 控制泡泡/iframe。不得讓整個後台 JavaScript bundle 跟著載入宿主網站。</p>
+<h3 id="spec-heading-15">03.2 匿名與會員模式</h3>
+<p>匿名可直接問一般知識，建立受限訪客 session。會員模式由宿主「後端」產生短期身分 token，再交換本系統 visitor access token。前端只傳 user_id 或 Email 不構成認證。</p>
+<p>預設匿名暫存使用宿主頁 <code>sessionStorage</code> 的不透明 resume token；短期 access token 僅留記憶體。清理瀏覽器儲存、換瀏覽器或匿名 token 過期後，不保證匿名歷史可恢復。會員可透過重新驗證恢復相同品牌內的歷史。</p>
+<p>匿名轉會員預設新建會員 session，不自動把所有匿名歷史合併。可提供單一目前對話的明確合併流程：同時驗證匿名持有權及新會員身分，顯示同意提示、寫入 audit；不得改寫曾屬於另一已驗證會員的對話。</p>
+<h3 id="spec-heading-16">03.3 斷線與體驗</h3>
+<p>F-WEB-005：先保存本地待送 draft，收到 HTTP 持久化成功回應後才顯示「已送出」。重試沿用 <code>client_message_id</code> 與 <code>Idempotency-Key</code>，不生成新的訊息。</p>
+<p>F-WEB-006：WebSocket 斷線採指數退避與抖動重連，使用該對話的持久事件 cursor 補資料；游標過期則抓取 snapshot。Fallback polling 起始 5 秒、背景分頁拉長至 30 秒，數值可調。</p>
+<p>F-WEB-007：AI 狀態與人工等待分開顯示。客服無人在線時，顯示離線留言而非「已接通真人」。不顯示虛構排名、等待時間或實際不存在的客服。</p>
+<p>F-WEB-008：WCAG 2.2 AA 作為 UI 驗收目標：鍵盤開關、focus trap/return、標籤、對比、可縮放、非純色狀態、合理 live region；測試不能只看 Lighthouse 分數。</p>
+<h3 id="spec-heading-17">03.4 隱私界線</h3>
+<p>預設只收集使用者主動提供的資訊、當前頁 path、語言及基本瀏覽器資訊；完整 URL query、fragment、DOM、螢幕錄影、session replay 均關閉。客服不得讀取會員密碼、OTP、私鑰或 API key。手機推播/Email 預設只有通知摘要，不塞入敏感對話全文。</p>
+<hr />
+<h2 id="spec-heading-18">04. 網頁 JS SDK 與嵌入安全</h2>
+<p>完整型別見 <code>contracts/widget-sdk.d.ts</code>，範例見 <code>examples/embed.html</code>。</p>
+<h3 id="spec-heading-19">04.1 對外方法</h3>
+<p><code>init</code>、<code>open</code>、<code>close</code>、<code>toggle</code>、<code>identify</code>、<code>logout</code>、<code>setContext</code>、<code>setAttributes</code>、<code>sendMessage</code>、<code>requestHuman</code>、<code>on</code>、<code>off</code>、<code>destroy</code>。</p>
+<p><code>init</code> / <code>identify</code> / <code>logout</code> / <code>sendMessage</code> 等非同步方法必須回傳 Promise。SDK 未 ready 前，命令排隊但最多 50 筆；重複 init 不建立第二個 socket/iframe。SPA 換頁只更新經白名單處理的 context，不重建身分。</p>
+<p>事件包括 <code>ready</code>、<code>opened</code>、<code>closed</code>、<code>unread:changed</code>、<code>message:received</code>、<code>conversation:updated</code>、<code>connection:changed</code>、<code>identity:changed</code>、<code>error</code>。事件只含該訪客可看的 DTO，不包含後台備註、secret、供應商原始回應或內部客戶欄位。</p>
+<h3 id="spec-heading-20">04.2 安全與身分交換</h3>
+<ol>
+<li><code>inbox_key</code> 是公開識別碼，不是 API key；host origin allowlist 只限制嵌入環境，不能替代身分認證或抗濫用。</li>
+<li>宿主後端根據自己的已登入 session 產生 JWT。允許演算法固定 HS256；採維護中的 JWT 函式庫，不自行實作簽章。金鑰至少 256-bit 隨機值，具有 <code>kid</code> 且可輪換 [R14]。</li>
+<li>Claims 至少含 <code>iss</code>、<code>aud=&quot;supportdesk:visitor&quot;</code>、<code>sub</code>、<code>workspace_id</code>、<code>brand_id</code>、<code>inbox_key</code>、<code>iat</code>、<code>exp</code>、<code>jti</code>；有效期預設 60 秒，時鐘誤差最多 30 秒。伺服器將 issuer/key 綁到正確 workspace/brand/inbox，不能只相信 payload。</li>
+<li><code>jti</code> 以 DB 原子唯一約束執行一次性交換。同一請求的安全重試需由 idempotency 紀錄識別；不能為了網路重試取消 replay 防護。</li>
+<li>交換出的 visitor token 15 分鐘有效，限制到 contact + brand + inbox + session；refresh token 不透明、旋轉、DB 僅存 hash，最長閒置 24 小時。member refresh 必須受宿主 logout/revocation 流程控制，不能當成永久登入。</li>
+<li><code>logout</code> 必須撤銷訪客 session、清除草稿/記憶體/本地 resume token、關閉舊 socket，再以新匿名 session 重建；不能只改畫面姓名。</li>
+<li><code>postMessage</code> 驗證 <code>event.origin</code>、<code>event.source</code> 與 handshake nonce；發送指定精確 targetOrigin，不使用 <code>*</code> [R12]。</li>
+<li>iframe 透過 inbox 設定輸出 CSP <code>frame-ancestors</code>，宿主需設定 script-src / frame-src / connect-src。禁止把 token 放在 iframe query、URL fragment、Referer、error log 或 analytics。</li>
+<li>已訂閱的 socket 不會因 token 到期自動變安全：必須有撤銷/斷線與短期重新授權機制；後端每次 publish 仍只送允許的受眾。</li>
+</ol>
+<p>第一版 WebView 優先載入已允許的 HTTPS 頁面。原生 App 的 <code>null</code> / 自訂 origin 不直接加入通配 allowlist；另建 app-session bridge，在 P2 驗證 app 端身分交換及 token 儲存。</p>
+<h3 id="spec-heading-21">04.3 SDK 發佈</h3>
+<p>提供固定版本路徑 <code>/sdk/v1.0.0/supportdesk.js</code>、major alias <code>/sdk/v1/supportdesk.js</code> 與 NPM package（有需要才發佈）。正式建議鎖固定版本與 SRI；hash 在 build 時產生，不寫假值。CDN 只快取公開 loader/assets，不快取私人 API/對話/附件。</p>
+<hr />
+<h2 id="spec-heading-22">05. 客服工作台</h2>
+<p>路徑 <code>/agent</code>。至少包含左側收件匣/隊伍清單、對話清單、訊息主區、客戶與操作側欄；手機最低可讀可回覆，進階運營操作可要求桌面。</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+  <th>功能 ID</th>
+  <th>規格</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>F-AG-001</td>
+  <td>我的案件、可接佇列、等待會員、已結案、篩選/標籤/未讀/搜尋；分頁不可一次載入所有聊天</td>
+</tr>
+<tr>
+  <td>F-AG-002</td>
+  <td>公開回覆與內部備註分開的輸入模式，顏色+文字標識，快捷鍵切換仍需清楚狀態</td>
+</tr>
+<tr>
+  <td>F-AG-003</td>
+  <td>接單、手動轉派、轉團隊、主管強制接手、退回佇列、結案、重開、稍後處理</td>
+</tr>
+<tr>
+  <td>F-AG-004</td>
+  <td>快捷回覆巨集、附件、引用訊息、草稿；巨集模板只允許核准變數並做 escaping</td>
+</tr>
+<tr>
+  <td>F-AG-005</td>
+  <td>AI 助理可建議回覆、摘要、推薦知識；人工模式只寫草稿，不自行送給客戶</td>
+</tr>
+<tr>
+  <td>F-AG-006</td>
+  <td>顯示使用的知識來源/版本、AI 執行狀態與可理解錯誤；僅有權限者可查看敏感 debug</td>
+</tr>
+<tr>
+  <td>F-AG-007</td>
+  <td>客戶身分標示「匿名 / 已驗證」，顯示品牌內紀錄與經授權的業務查詢結果</td>
+</tr>
+<tr>
+  <td>F-AG-008</td>
+  <td>結案需選原因；可選內部摘要及標籤。結案不等於刪除；保留審計軌跡</td>
+</tr>
+<tr>
+  <td>F-AG-009</td>
+  <td>回覆前若版本/負責人已改變，回傳衝突並保留草稿，不靜默覆蓋別人操作</td>
+</tr>
+<tr>
+  <td>F-AG-010</td>
+  <td>新訊息音效、瀏覽器通知可選；多分頁以 leader/去重避免連續多次提示</td>
+</tr>
+</tbody>
+</table></div>
+<p>客服狀態：<code>available</code>、<code>busy</code>、<code>away</code>、<code>offline</code>。前端每 30 秒 heartbeat；90 秒無 heartbeat 視為 offline，彙整多分頁而非任一分頁離線就登出。Presence 只影響分派候選，非權限來源。</p>
+<p>客服離線不立即把正在處理的每個案件搶走。預設保留 5 分鐘，再對未讀且需要回覆的案件進入重新分派；waiting_customer 可維持負責人，主管可調整。全程記錄 assignment event。</p>
+<hr />
+<h2 id="spec-heading-23">06. 運營後台</h2>
+<p>路徑 <code>/ops</code>。首版至少有以下頁面與操作：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+  <th>頁面</th>
+  <th>必須內容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>總覽</td>
+  <td>待接、處理中、超時待處理、在線客服、AI 成功/轉人工、渠道異常；可按品牌/收件匣/日期篩選</td>
+</tr>
+<tr>
+  <td>公司與品牌</td>
+  <td>workspace 名稱、時區、品牌、客服名稱、logo、隱私文案</td>
+</tr>
+<tr>
+  <td>收件匣</td>
+  <td>網站/渠道類型、嵌入代碼、允許 origin、營業時間、節假日、分派規則、容量、啟用狀態</td>
+</tr>
+<tr>
+  <td>人員與權限</td>
+  <td>邀請、啟用/停用、MFA、角色、團隊、品牌/收件匣授權、座席容量</td>
+</tr>
+<tr>
+  <td>知識庫</td>
+  <td>文件列表、建立/匯入、版本比較、編輯草稿、索引狀態、發布/退版/撤下、測試提問</td>
+</tr>
+<tr>
+  <td>AI 設定</td>
+  <td>provider connection、模型清單、能力、secret 更新、測試連線、聊天/embedding/rerank profile、預算、停用</td>
+</tr>
+<tr>
+  <td>AI 品質</td>
+  <td>問題評測集、引用命中、無答案、轉人工原因、人工修正；不能把模型自評當唯一分數</td>
+</tr>
+<tr>
+  <td>巨集與規則</td>
+  <td>快捷回覆、結案原因、標籤、允許的自訂欄位、簡單條件/動作自動化</td>
+</tr>
+<tr>
+  <td>串接中心</td>
+  <td>API token、issuer key、Webhook、重送紀錄、渠道健康、業務 API schema/secret</td>
+</tr>
+<tr>
+  <td>報表</td>
+  <td>工作量、首回覆/解決時間、轉人工、CSAT、AI 用量；權限範圍內下載 CSV</td>
+</tr>
+<tr>
+  <td>稽核</td>
+  <td>登入、權限改動、知識發布、provider 修改、匯出、閱覽敏感資料、轉派/結案、資料刪除</td>
+</tr>
+<tr>
+  <td>系統健康</td>
+  <td>對具備 platform operator 權限者顯示 queue、DB、Reverb、儲存與備份狀態</td>
+</tr>
+</tbody>
+</table></div>
+<p>規則引擎首版只接受 typed JSON：條件 <code>inbox / tag / business_hours / verified_customer / language</code>，動作 <code>assign_team / add_tag / enqueue_human / send_approved_macro</code>。不執行 arbitrary PHP/JS/SQL，防止規則互相觸發循環；一次事件最多 10 個動作，含 <code>causation_id</code>。</p>
+<hr />
+<h2 id="spec-heading-24">07. 角色、權限與資料隔離</h2>
+<h3 id="spec-heading-25">07.1 RBAC 加資源範圍</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+  <th>角色模板</th>
+  <th>預設能力</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Owner</td>
+  <td>workspace 管理、委派角色、資安與資料治理、營運；所有 secret 一樣只能寫入/遮罩不可原文查看</td>
+</tr>
+<tr>
+  <td>Operations Admin</td>
+  <td>收件匣、人員、AI/知識配置；不能自行變成 Owner 或賦予自己沒有的權限</td>
+</tr>
+<tr>
+  <td>Supervisor</td>
+  <td>指定團隊/收件匣的案件監督、轉派、報表、協助回覆</td>
+</tr>
+<tr>
+  <td>Agent</td>
+  <td>自己負責案件與有資格接取的未分派案件；不得預設查看其他人已接案件</td>
+</tr>
+<tr>
+  <td>Knowledge Editor</td>
+  <td>草稿/匯入/索引，不自帶發布權限或對話內容權限</td>
+</tr>
+<tr>
+  <td>Knowledge Publisher</td>
+  <td>審閱及發布核准範圍內知識；可與 Editor 分人</td>
+</tr>
+<tr>
+  <td>Auditor</td>
+  <td>範圍內稽核/去識別報表；聊天原文與匯出需另授權</td>
+</tr>
+<tr>
+  <td>Integration Client</td>
+  <td>機器 token，固定 scopes/品牌/收件匣；不是 Staff User</td>
+</tr>
+</tbody>
+</table></div>
+<p>權限碼至少包括 <code>workspace.manage</code>、<code>brand.manage</code>、<code>inbox.manage</code>、<code>staff.manage</code>、<code>roles.assign</code>、<code>conversation.read</code>、<code>conversation.claim</code>、<code>conversation.reply</code>、<code>conversation.note</code>、<code>conversation.assign</code>、<code>conversation.resolve</code>、<code>conversation.reopen</code>、<code>conversation.assist_other</code>、<code>contact.read_sensitive</code>、<code>knowledge.edit</code>、<code>knowledge.publish</code>、<code>ai.manage</code>、<code>integration.manage</code>、<code>report.read</code>、<code>export.create</code>、<code>audit.read</code>、<code>data.erase</code>。</p>
+<p>每個 grant 帶 workspace 以及可選 brand/inbox/team scope。有效能力 = 已認證身分 + workspace membership 有效 + 動作權限 + 資源 scope；不可只因有同名 role 就授權所有品牌。</p>
+<h3 id="spec-heading-26">07.2 隔離要求</h3>
+<p>所有業務表、cache key、job、vector 查詢、附件路徑、匯出、推送與 webhook 都帶 workspace scope。列表、統計、搜尋結果數與客服 sidebar 也必須隔離，不只 detail endpoint。</p>
+<p>RLS 可作第二層防護，但不是取代 Laravel Policy。首版至少做到 application scope + composite foreign keys + 多 workspace 攻擊測試。啟用 RLS 時用非 owner、非 BYPASSRLS 的 runtime role，對 pooled connection 使用 transaction-local context，避免跨工作殘留；migration role 與 runtime role 分開。PostgreSQL 明確指出 owner/特權角色具有繞過行為 [R07]。</p>
+<p>使用者停用或權限撤銷後，既有 session、API token 和 socket 應在 60 秒內失效。稽核記錄保留操作者、授權 scope、原因及變更前後的非 secret 摘要。</p>
+<hr />
+<h2 id="spec-heading-27">08. 對話狀態機與人工分派</h2>
+<h3 id="spec-heading-28">08.1 兩個獨立欄位</h3>
+<p><code>status = open | waiting_customer | snoozed | resolved</code>。</p>
+<p><code>handling_mode = ai | human_queue | human</code>。</p>
+<ul>
+<li>活躍的 <code>ai</code> / <code>human_queue</code> 必須 <code>status=open</code> 且 <code>assignee_id=null</code>。</li>
+<li>活躍的 <code>human</code> 必須有有效歷史 assignee；assigned staff 被停用時由 supervisor/排程退回佇列。</li>
+<li><code>waiting_customer</code> / <code>snoozed</code> 僅限 human。</li>
+<li><code>resolved</code> 保留最後 handling_mode/assignee 作歷史資訊，但不得繼續執行 AI 或發新公開訊息；先重開才可回覆。</li>
+</ul>
+<p>不把「結案」和「AI 接待」塞成一組互斥單欄位。<code>version</code> 用於人工操作的 optimistic concurrency；<code>answer_epoch</code> 用於廢止舊 AI 回覆，不能混用。</p>
+<h3 id="spec-heading-29">08.2 主要轉換</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+  <th>觸發</th>
+  <th>結果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>新會話且 auto AI 啟用/服務可用</td>
+  <td>open + ai</td>
+</tr>
+<tr>
+  <td>未啟用 AI / 明確轉人工 / AI 故障 / 政策要求</td>
+  <td>open + human_queue</td>
+</tr>
+<tr>
+  <td>可用客服接單/自動分派成功</td>
+  <td>open + human + assignee</td>
+</tr>
+<tr>
+  <td>客服公開回覆並選「等待會員」</td>
+  <td>waiting_customer + human</td>
+</tr>
+<tr>
+  <td>會員回覆 waiting_customer</td>
+  <td>open + human，保留負責人；如失效則轉 human_queue</td>
+</tr>
+<tr>
+  <td>客服稍後處理</td>
+  <td>snoozed + human + wake_at；醒來重檢容量/人員，不適合則 human_queue</td>
+</tr>
+<tr>
+  <td>人工結案</td>
+  <td>resolved + resolution_code，釋放容量</td>
+</tr>
+<tr>
+  <td>已結案後會員在 72 小時內再發問</td>
+  <td>原對話重開；之前由人工接待則 human_queue，不能自行偷偷交回 AI</td>
+</tr>
+<tr>
+  <td>超過重開視窗</td>
+  <td>建立新對話，保留 related_conversation_id</td>
+</tr>
+<tr>
+  <td>人工明確「交還 AI」</td>
+  <td>取消 assignee、open + ai、增加 answer_epoch；記錄原因</td>
+</tr>
+</tbody>
+</table></div>
+<p>AI 預設不能自行判定問題已解決。會員按「已解決」可結案；無回應自動結案需另啟用規則，且報表計為 <code>auto_inactive</code> 而非已證實解決。</p>
+<h3 id="spec-heading-30">08.3 分派規則</h3>
+<p>先依 workspace/brand/inbox/team/營業時間找 eligible agents，再檢查 available、heartbeat、容量；排序以 <code>last_assigned_at ASC, staff_id ASC</code> 輪流分派。預設每位客服活躍容量 5，可配置；<code>open + waiting_customer</code> 的人工案件計容量，resolved/snoozed 不計。</p>
+<p>分派與接單必須用 DB transaction + row lock 實作。統一鎖順序：conversation → candidate capacity row（多位時固定 staff id 順序）。在同一交易內重查案件狀態、使用者資格與容量後更新。Redis lock 只能優化競爭，不能是正確性唯一依據。</p>
+<p>沒有 eligible agent 時留在 human_queue 並顯示真正的等待/離線狀態。只有 supervisor 的強制轉派可超容量，需明確確認與 audit reason；不能用一般自動分派悄悄超額。</p>
+<hr />
+<h2 id="spec-heading-31">09. 訊息、事件與一致性</h2>
+<h3 id="spec-heading-32">09.1 訊息模型</h3>
+<p>Message 支援 <code>text</code>、<code>attachment</code>、<code>system</code>；作者 <code>visitor / staff / ai / system</code>；可見性 <code>public / internal</code>。欄位詳見資料字典。DB 訊息 append-only；修改/刪除使用 edit/redaction 紀錄及 tombstone，不直接改寫歷史而無痕跡。</p>
+<p>同一 conversation 內的 <code>message_seq</code> 由鎖定 conversation row 後遞增取得，不以 UUID/時間戳排序。JavaScript 對 bigint 使用十進位字串，不轉 Number。</p>
+<h3 id="spec-heading-33">09.2 冪等</h3>
+<p>瀏覽器/第三方送訊息必须帶 <code>client_message_id</code>；HTTP 寫入帶 <code>Idempotency-Key</code>。scope 至少包含 workspace + principal/session/client + method + route。相同 key/body 重試回原有結果；同 key 不同 body 回 <code>409 IDEMPOTENCY_CONFLICT</code>。</p>
+<p>訊息另有長期唯一約束；即使 24 小時 HTTP idempotency cache 到期，也不能建立相同來源的重複訊息。第三方有 external_message_id/event_id 時以 connector + external id 去重。</p>
+<h3 id="spec-heading-34">09.3 人工接手與 AI 發布競態</h3>
+<p>AI run 捕捉 <code>answer_epoch</code>、<code>latest_customer_message_id</code>、<code>knowledge_generation</code>、<code>configuration_version</code> 與 task lease token。模型呼叫在交易外執行。</p>
+<p>在發布前開一個短交易，鎖定 conversation 與 ai_run，確認：run 尚有效、task lease 屬於自己、handling_mode=ai、status=open、epoch/最新會員訊息/知識 generation/配置版本均一致。全部通過才能插入 AI message、更新 run=published、建立事件。</p>
+<p>人工接手/轉人工、新的會員輸入、對話結案、知識撤下/發布或重要 AI 設定更動，必須廢止不再有效的 run。若人工接手先提交，AI 不得發出新公開答案；若 AI 先提交，該答案算接手之前已發布，不能宣稱可撤回已送達的網路資料。</p>
+<p>人工內部備註或 read marker 不應單獨讓 AI 重新生成。對外 token 級串流預設不開啟，避免尚未檢查的內容已經被使用者看見。</p>
+<h3 id="spec-heading-35">09.4 Transactional Outbox 與重播</h3>
+<p>在同一個 DB transaction 保存 message/state + durable event + async task。成功提交後 HTTP 可回 accepted；queue enqueue 失敗不回滾已保存訊息，也不能造成客戶端誤以為沒有發送。</p>
+<p>Dispatcher 以 lease 取出事件/任務，執行推送、webhook 或 queue 投遞。交付語意為 at-least-once，不宣稱網路 exactly-once；consumer 以 event_id 去重。<code>afterCommit()</code> 可用，但不等於完整 outbox，不能省略故障修復。</p>
+<p>public/staff 有不同 projection 及各自 <code>event_seq</code>。內部備註不得以「先廣播完整資料、前端自己藏」處理。HTTP 補事件依單一對話與 audience cursor 查詢；保留 7 天，過期回 <code>410 CURSOR_EXPIRED</code> 並提供 snapshot 方式。</p>
+<hr />
+<h2 id="spec-heading-36">10. 知識庫、文件與 RAG</h2>
+<h3 id="spec-heading-37">10.1 來源與發布</h3>
+<p>首版輸入：FAQ（問、答、同義問法）、Markdown、TXT、文字型 PDF。PDF 僅抽出文字，不承諾正確解析所有表格；掃描件顯示 <code>OCR_REQUIRED</code>，OCR 屬 P3。網站匯入只允許人工指定的公開頁面，嚴格 SSRF/大小/頁數限制，完整爬站/排程同步列 P2。</p>
+<p>每份文件有 immutable version：<code>draft → indexing → ready → published → archived</code>，失敗為 <code>failed</code> 可重試。編輯產生新版本，舊發布版繼續服務；新版本完整建立 chunks/embeddings 後才能原子切換。撤下立即影響新檢索，舊 run 必須重新檢查 generation。</p>
+<p>核准範圍：workspace、brand、指定 inbox、語言、適用期間。知識可見性 <code>external_answerable</code> 與 <code>staff_only</code> 分開；外部 AI 一律排除 staff_only，不是只把來源連結藏起來。對外 Help Center 公開文章是另外的發布 flag，external_answerable 不代表原文件可公開下載。</p>
+<h3 id="spec-heading-38">10.2 Pipeline</h3>
+<p><code>原始檔 → 隔離掃描 → 擷取 → 正規化 → 結構切段 → Embedding → 索引檢查 → 待發布/發布</code>。</p>
+<p>預設 chunk 目標 600 tokens、overlap 80，依標題/FAQ/段落優先保留上下文；數字是起點，對中文 tokenizer 實測後調整。FAQ 問答不要拆開；條款、例外、日期、表格標題與來源定位需隨 chunk 保留。</p>
+<p>每個 chunk 保存文件版本、chunk index、標題路徑、page/offset、content hash、語言、有效期、可見性及 embedding profile。內容不經人工發布不得成為正式外部回答來源。</p>
+<h3 id="spec-heading-39">10.3 查詢流程</h3>
+<p>先完成授權與資料範圍過濾，再做問題正規化；對精確型號/錯誤碼優先 lexical，語意查詢使用向量。起始候選 vector 20 + lexical 20，以 RRF 合併去重，取 8；可配置 rerank 後取 5，再依模型 context budget 截斷。</p>
+<p>中文 lexical 首版至少包含可編輯 FAQ keywords、標題/別名/錯誤碼的精確或部分比對；可用 pg_trgm 輔助。不要宣稱 PostgreSQL 預設全文檢索已解決中文斷詞，需繁體中文評測驗收 [R16]。純向量、混合及 rerank 的效果以固定測試集比較，不憑展示案例選擇。</p>
+<p>所有查詢必須同時限制 workspace、brand/inbox knowledge binding、外部可見性、published version、有效時間與 embedding profile。ANN 索引的過濾可能減少候選數，需要評估 iterative scan/預選/分區或回退精確檢索；不能看到有 WHERE 就假設召回數一定足夠 [R06]。</p>
+<h3 id="spec-heading-40">10.4 Embedding 模型管理</h3>
+<p>Chat model、Embedding model、Reranker 是三種獨立設定。更換 Chat model 不重建向量；更換 Embedding 模型、維度、正規化或 task type 建立新 profile 並全量重建。即使同維度，不同模型也不混搜。</p>
+<p>資料表允許多 profile 共存，只有核准 active profile 可被新查詢使用。新索引覆蓋率與評測通過後切換，舊 profile 保留回滾期。pgvector HNSW 的 <code>vector</code> 索引有 2,000 維限制、<code>halfvec</code> 可到 4,000 維；不要對 3,072 維資料直接建立不相容的 vector HNSW。具體表/索引策略見資料字典 [R06]。</p>
+<h3 id="spec-heading-41">10.5 回覆與來源</h3>
+<p>答案須基於取回的核准來源，沒有足夠來源則說明需要人工。模型輸出可以包含 <code>[S1]</code> 類引用，但後端必須確認 reference id 屬於此次檢索結果；不接受模型捏造 URL。</p>
+<p>一般招呼可用核准固定模板，不必勉強附文件。退款規則、金額、時效、資格等規則型回答必須有可驗證依據。任何無法證實的「信心分數」不得直接當作 0.8 以上就保證正確；retrieval/rerank score 必須按 profile 評測校準。</p>
+<p>首版供應商拒答、截斷、無來源、JSON schema 不符或來源撤下，最多一次受控重試/重新檢索，仍失敗轉人工。不能從任意 provider 失敗就自動把同一會員資料送給另一家。</p>
+<hr />
+<h2 id="spec-heading-42">11. AI 接待、供應商抽象與工具</h2>
+<p>完整規格見 <code>AI_ADAPTERS.md</code>。</p>
+<h3 id="spec-heading-43">11.1 產品模式</h3>
+<p>每個 inbox 可選 <code>disabled</code>、<code>assist_only</code>、<code>auto_reply</code>。Disabled 不呼叫模型；assist_only 只對人工產生草稿；auto_reply 僅在對話處於 AI 接待狀態自動公開回覆。設全 workspace、單品牌、單收件匣 kill switch。</p>
+<p>使用 Laravel AI SDK 作第一個實作而不是業務契約本身；官方文件有多供應商文字、embedding、rerank 及自訂 endpoint 支援，但功能依供應商不同 [R02]。</p>
+<p>供應商連線必須區分：</p>
+<ul>
+<li>OpenAI Responses 原生格式。</li>
+<li>OpenAI Chat Completions 相容格式（本地或第三方 gateway 可能只支援這個）。</li>
+<li>Anthropic Messages 原生格式。</li>
+<li>Gemini GenerateContent 原生格式。</li>
+</ul>
+<p>不要只換 base URL 就宣稱四者完全相容。模型名稱不寫死，能力矩陣按 connection + model + protocol 驗證。新官方 API 另加 adapter，不替換已有契約。</p>
+<h3 id="spec-heading-44">11.2 工作流程與降級</h3>
+<p>同一對話收新訊息可 debounce 800ms 合併思考，但每則原文獨立保存。先查 deterministic handoff（明確要求人工/禁用/超額），再檢索與生成。最多一次自動澄清後仍不確定轉人工，不讓會員陷入重複問題。</p>
+<p>AI 回覆從原始會員訊息接受起算預設最多 90 秒，包含 queue 等待。超過期限即標記 run 失效並交人工，不等 AI worker 自己從永遠卡住的狀態醒來。外部模型逾時、worker 掛掉、Redis 故障時，由獨立 DB watchdog 处理。</p>
+<h3 id="spec-heading-45">11.3 訂單/會員/CRM 工具</h3>
+<p>一般規則走知識庫；「我的訂單/餘額/處理進度」走有授權的業務 API。首版工具只允許 readonly，例如 <code>get_my_order_status</code>、<code>get_my_service_case</code>；未驗證的 visitor 不可使用。</p>
+<p>工具的 contact/user/tenant 識別由可信 ActorContext 注入，不允許模型提供另一個 user_id。模型只能提出允許的查詢參數，後端驗證 ownership、schema、rate limit、timeout、欄位遮罩。禁止模型任意呼叫 URL、SQL、shell，或將工具結果內的文字當新指令。</p>
+<p>會更動帳務、退款、出金、會員權限的操作不是首版範圍。未來要加入時，必須有獨立 human approval、短效確認、idempotency 及完整審計，不因 LLM 說「客戶同意」就執行。</p>
+<hr />
+<h2 id="spec-heading-46">12. 其他平台與系統串接</h2>
+<h3 id="spec-heading-47">12.1 三層分離</h3>
+<p>Channel Adapter：LINE、Telegram、Email、網站等訊息收送。</p>
+<p>Business Integration：會員/订单/CRM/ERP API，只處理經授權的資料與工具。</p>
+<p>Automation Integration：Webhook、n8n/Make 類自動化、內部通知；只依事件與權限行動，不直接改 DB。</p>
+<h3 id="spec-heading-48">12.2 Channel Adapter 契約</h3>
+<p>至少包含 <code>verifyInbound</code>、<code>normalizeInbound</code>、<code>sendOutbound</code>、<code>fetchAttachment</code>、<code>capabilities</code>。Inbound 正規化成同一套 Contact/Conversation/Message；保留原始 external ids 與必要 metadata，原始 payload 需加密且短期留存。</p>
+<p>能力欄位包括文字/附件/引用/已讀/輸入中/編輯/刪除/模板/主動發送/外部冪等。UI 依能力顯示，不支援的操作不顯示假成功。內部備註永不轉成外部訊息。</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+  <th>渠道</th>
+  <th>階段</th>
+  <th>實作/驗收注意</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Web / iframe / hosted page</td>
+  <td>M1</td>
+  <td>可完整控制身分、訊息、已讀、重連</td>
+</tr>
+<tr>
+  <td>通用渠道 API/Webhook</td>
+  <td>M3</td>
+  <td>服務端 token、HMAC、持久化、去重、重試與測試工具</td>
+</tr>
+<tr>
+  <td>LINE Messaging API</td>
+  <td>P2</td>
+  <td>官方 webhook 簽章、event id 去重、重送/亂序、回覆/主動發送差異、附件、取消訊息；上線前檢查最新規則 [R13]</td>
+</tr>
+<tr>
+  <td>Telegram Bot API</td>
+  <td>P2</td>
+  <td>secret token/webhook、update_id 去重、chat/user/thread mapping、bot 能力與權限限制 [R15]</td>
+</tr>
+<tr>
+  <td>Email</td>
+  <td>P2</td>
+  <td>SMTP/供應商 adapter + inbound provider/IMAP；Message-ID/References threading、去重、auto-reply loop、附件掃描、垃圾信；不可只用主旨配對</td>
+</tr>
+<tr>
+  <td>WhatsApp / Messenger / Instagram</td>
+  <td>P3</td>
+  <td>官方企業/API 審核、授權、模板/回覆限制、送達回執、簽章；不得假定一般帳號即可接入，具體政策在實作前重新核對</td>
+</tr>
+<tr>
+  <td>Slack / Teams / Discord</td>
+  <td>P3</td>
+  <td>優先當內部通知/升級目的地；要作客服渠道另驗收會員與 thread 權限</td>
+</tr>
+<tr>
+  <td>原生 App / Capacitor</td>
+  <td>P2</td>
+  <td>安全 session bridge、push token、深連結、裝置登出/撤銷；不能沿用瀏覽器 null origin 放行</td>
+</tr>
+</tbody>
+</table></div>
+<p>每個第三方 connector 有 enabled、credentials、capabilities、last_success、health、rate-limit、circuit state、raw retention 與 retry policy。外部回呼缺失/順序錯亂時，不把 delivered/read 狀態倒退。</p>
+<h3 id="spec-heading-49">12.3 一般 Server-to-Server API</h3>
+<p>提供 contact upsert、建立對話、送訊息、查狀態、申請轉人工、建立/更新知識版本、查詢事件等 scopes。API token 至少 256-bit 隨機值、只顯示一次、DB 存 hash，可按 IP/expiry/brand/inbox 限縮；所有 API 使用 HTTPS。</p>
+<p>會員端的 API key 永遠不得放在 JS SDK。簡單 integration token 不能當作 workspace owner；上下游 contact 對應受 connector issuer 約束。</p>
+<h3 id="spec-heading-50">12.4 出站 Webhook</h3>
+<p>事件包括 <code>conversation.created</code>、<code>conversation.handoff_requested</code>、<code>conversation.assigned</code>、<code>conversation.resolved</code>、<code>conversation.reopened</code>、<code>message.created</code>、<code>message.delivery_updated</code>、<code>knowledge.published</code>、<code>ai.run.failed</code>。</p>
+<p>Header：<code>X-SupportDesk-Event-Id</code>、<code>X-SupportDesk-Timestamp</code>、<code>X-SupportDesk-Key-Id</code>、<code>X-SupportDesk-Signature</code>。簽章原文為 <code>timestamp + &quot;.&quot; + raw_body</code>，HMAC-SHA256 hex，header 形式 <code>v1=&lt;hex&gt;</code>；receiver 以 constant-time 比較，接受時間窗預設 ±300 秒並以 event_id 去重。</p>
+<p>投遞需 durable outbox，預設重試 30s/2m/10m/1h/6h/24h，使用 jitter，最多 10 次；401/403 應告警暫停，429 尊重 Retry-After。每次重送重新產生 timestamp/signature、保持 event_id/body 語意不變。手動重送需 audit。</p>
+<p>URL 只能 HTTPS，預設禁用 redirects，DNS/IP/port 檢查及網路 egress policy 防 SSRF。需要內網 connector 時由 platform operator 以特定 hostname/port 明確批准，不能讓一般租戶勾選「允許所有內網」 [R17]。</p>
+<h3 id="spec-heading-51">12.5 身分與外部帳號連結</h3>
+<p>Staff SSO 預留 OIDC，SAML 後續需求再加。外部 LINE/Telegram 身分與網站會員連結需要可驗證 linking flow；Email/姓名相同不足以合併。跨品牌預設完全不合併。MCP 如未來開放，仍經同一個 ToolPolicy/ActorContext，不能繞過既有授權。</p>
+<hr />
+<h2 id="spec-heading-52">13. API、事件與錯誤規約</h2>
+<p>首版 API 詳見 <code>API_CONTRACT.md</code> 與 OpenAPI。主要命名空間：</p>
+<ul>
+<li><code>/api/v1/widget/*</code>：訪客，短期 bearer token。</li>
+<li><code>/api/v1/workspaces/{workspace_id}/*</code>：後台，session + CSRF + workspace policy。</li>
+<li><code>/api/v1/integrations/*</code>：服務端，scoped bearer token。</li>
+<li><code>/api/v1/hooks/{connector_key}</code>：經驗證 webhook，無 staff session。</li>
+</ul>
+<p>回應以 <code>{data, meta}</code>，錯誤以 <code>{error:{code,message,details,request_id}}</code>。一般 payload 最大 64KiB；文字訊息最大 8,000 Unicode characters；附件走專用上傳流程，不塞 base64。cursor pagination 預設 50、上限100。時間 RFC3339 UTC，金額 decimal 字串+currency，bigint/seq 使用十進位字串。</p>
+<p>不可直接序列化 Eloquent model。PublicMessage、StaffMessage、ContactPublic、ContactStaff 分開 resource；DTO 調整需 contract test。</p>
+<h3 id="spec-heading-53">13.1 錯誤碼</h3>
+<p><code>UNAUTHENTICATED(401)</code>、<code>FORBIDDEN(403)</code>、<code>NOT_FOUND(404)</code>、<code>VERSION_CONFLICT(409)</code>、<code>IDEMPOTENCY_CONFLICT(409)</code>、<code>CAPACITY_EXCEEDED(409)</code>、<code>INVALID_STATE(409)</code>、<code>IDENTITY_REPLAYED(409)</code>、<code>NEW_CONVERSATION_REQUIRED(409)</code>、<code>CURSOR_EXPIRED(410)</code>、<code>VALIDATION_FAILED(422)</code>、<code>CAPABILITY_UNSUPPORTED(422)</code>、<code>RATE_LIMITED(429)</code>、<code>TEMPORARILY_UNAVAILABLE(503)</code>。</p>
+<p>未授權物件可用 404 降低存在性洩露，但同一類接口保持一致。AI 供應商錯誤只显示去敏感摘要與 internal error code，不透傳 key、prompt、請求headers。</p>
+<hr />
+<h2 id="spec-heading-54">14. 附件、檔案與內容安全</h2>
+<p>首版對話附件允許 PNG/JPEG/WebP/PDF/TXT；每檔10MiB、每訊息最多5個，可配置。知識匯入每檔20MiB，文字型 PDF 200頁上限作起點。SVG/HTML/可執行檔/壓縮檔預設禁止。</p>
+<p>檔案需 workspace/contact/staff 範圍驗證；上傳宣告的 Content-Type 不可信，檢查 magic bytes、實際大小、解碼後像素數/壓縮炸彈與病毒掃描。狀態 <code>pending_upload → quarantined → clean | rejected</code>，未 clean 不可供會員/AI/第三方下載或引用。</p>
+<p>使用私有 bucket/object key；短效簽名下載有效期60秒，生成前重查權限，移除/撤銷後不再簽發。圖片移除 EXIF，預覽採安全轉換；PDF 以下載或隔離檢視器顯示。遠端附件下載亦適用 SSRF、redirect、大小及 timeout 限制。</p>
+<p>掃描服務故障時 fail closed：附件留待處理，文字訊息仍可使用；不能因為掃描失敗改成自動允許。</p>
+<hr />
+<h2 id="spec-heading-55">15. 安全、稽核、資料保留與 AI 防護</h2>
+<p>管理員/主管正式環境強制 MFA；登入限流、邀請/重設 token 單次短效。後台同站 cookie HttpOnly/Secure/SameSite、CSRF 保護；widget 跨站使用受限 bearer，不依赖第三方 cookie。Sanctum 的 SPA cookie 模式與 API token 是不同機制，不混為一談 [R05]。</p>
+<p>所有可顯示文字 escaping；Markdown 僅白名單安全 render。附件/Knowledge/工具結果視為不可信資料，不能覆蓋 system policy。模型對話不直接包含 secret、內部備註或超出 actor 範圍的資料。</p>
+<p>provider credentials / connector secrets 使用 secret_ref 或 envelope encryption，資料庫備份與解密金鑰分開保存；禁止原文匯出。日誌採 allowlist，不紀錄 Authorization、Cookie、JWT、refresh token、完整 prompt 或工具敏感結果；必要 debug 單獨加密、權限控管、短期到期。</p>
+<p>預設保留提案：聊天與附件180天、稽核365天、去識別 AI 執行 metadata 90天、原始 webhook payload 7天、原始 provider debug 預設0天、realtime events 7天、一般 idempotency response24小時。這些是產品設定，不是法律合規結論；正式啟用前由資料負責人確認。</p>
+<p>資料刪除必須涵蓋 DB、附件、向量、cache、評測複本與已匯出暫存；backup 依到期策略與 erasure tombstone 處理，還原後重放 tombstone。供應商端的保留不能因本地刪除就假設同步完成。</p>
+<hr />
+<h2 id="spec-heading-56">16. 佇列、部署與故障恢復</h2>
+<h3 id="spec-heading-57">16.1 儲存與程序</h3>
+<p>正式環境至少分開 <code>app</code>、<code>reverb</code>、<code>horizon-core</code>、<code>horizon-ai</code>、<code>horizon-kb</code>、<code>scheduler/watchdog</code>。可以同機多程序/容器起步，不代表高可用。PostgreSQL、Redis、物件儲存不對公网開放。</p>
+<p>Redis queue 專用 instance / 非 Cluster endpoint；Horizon 官方文件目前不相容 Redis Cluster，不能直接用 Cluster/某些 serverless Redis 當可替換選项 [R04]。queue instance 使用 <code>noeviction</code>、持久化與容量告警；cache 可另 instance 採適合的淘汰政策。只分 logical DB 不等於記憶體與故障隔離。</p>
+<p>所有 queue payload 只帶 task/workspace/entity id 與小型 metadata，目標16KiB以下；文件、完整聊天、圖片/base64、巨大 ORM 關聯不得塞進 Redis。</p>
+<h3 id="spec-heading-58">16.2 逾時與資源隔離</h3>
+<p>以 <code>CONFIG_DEFAULTS.yaml</code> 為起始值。AI HTTP connect5s、單次回應45s、整個 run deadline90s；job timeout70s、Horizon supervisor timeout80s、queue connection retry_after120s。KB：job240s、supervisor270s、retry_after330s。各種 connection 的 retry_after 分開配置，不能只設單一90秒却跑4分鐘索引工作。</p>
+<p>Laravel 要求 worker timeout 短於 retry_after；還要避免 SDK 自動重試疊加 job 重試造成請求放大 [R08]。AI run 最多2次 provider嘗試且受總deadline約束；常態不得 <code>tries=0</code> 無限重試。</p>
+<p>Horizon 至少分 core、ai、kb、events/channels supervisor，core/dispatch/watchdog 保留資源，不能全部 autoscale 到 AI。傳送失敗的渠道處理使用獨立重試策略。</p>
+<h3 id="spec-heading-59">16.3 Durable 任務與 watchdog</h3>
+<p><code>async_tasks</code> 保存 pending/queued/running/succeeded/failed/cancelled 與 lease。dispatcher 可以重投 lost/stale 任務；worker 原子 claim 並驗證 fencing token，完成後標記。Redis 清空/失效後可由 DB 找出需要恢復的任務，但恢復流程必須演練。</p>
+<p>獨立 watchdog 每10秒檢查已超 deadline 的 AI run 與無人處理的 queued/running 任務；不依賴同一條 AI queue 才能把會員轉人工。DB 還活著且 app可服務時，Redis/Reverb 故障可維持 HTTP 訊息保存、人工輪詢及稍後推送恢復。</p>
+<h3 id="spec-heading-60">16.4 發佈與備份</h3>
+<p>鎖定 Composer/NPM lock、Docker digest、migration版本。採 expand/contract schema migration；先 staging、備份驗證、相容發佈、重啟長駐worker/reverb、觀察後才移除舊欄位。不在正式環境跑 <code>migrate:fresh</code> / 無確認清空資料。</p>
+<p>DB 做持續 WAL/PITR + 每日base備份，附件做版本/備份，解密key另行備份。起始目標 RPO≤15分鐘/RTO≤2小時只在備份與還原演練證實後標記達標；單純每日 pg_dump 不能宣稱15分鐘RPO。</p>
+<hr />
+<h2 id="spec-heading-61">17. 可觀測性、指標與報表定義</h2>
+<p>每個 request、conversation、message、ai_run、async_task、webhook delivery 可用 request_id/trace_id 關聯；不以 raw prompt 當 trace。</p>
+<p>指標：HTTP p95/error、訊息持久化耗時、queue oldest age、AI首次嘗試等待/生成/總時間、手動接單等待、handoff原因、未分派量、向量檢索時間與候選數、embedding失敗率、outbox滯留、重複抑制、delivery_unknown、Redis memory/eviction、PG connection/lock、Reverb connections/reconnect。</p>
+<p>首回覆時間分 human 與 AI；結案後重開不覆寫第一次回覆事件；AI containment 是觀測視窗內未轉人工，不等於問題一定解決。CSAT 只對有效問卷回覆計算，報表顯示分母/回收率。模型成本分 confirmed usage 與 estimated usage，價格配置有幣別與生效日，不硬編碼網路價格。</p>
+<p>告警起點：core queue oldest&gt;10秒、AI期限超過占比&gt;5%、outbox超60秒、任意Redis eviction&gt;0、DB容量&gt;80%、備份過期、跨租戶拒絕異常增加。門檻依實際流量調整。</p>
+<hr />
+<h2 id="spec-heading-62">18. 效能與品質驗收</h2>
+<p>這些是可重現驗收目標，不代表已實測達標。測試必須記錄版本、硬體、worker數、DB索引、資料量與模型/模擬器設定。</p>
+<p><strong>參考環境</strong>：8 vCPU / 16GiB RAM應用+worker，獨立4 vCPU / 16GiB PostgreSQL，獨立Redis；模型使用可控fake服務測試平台，真實模型另測。目標不是要求第一天租這個規格，而是避免沒有環境基準的速度承諾。</p>
+<p><strong>資料集</strong>：2 workspace、各2 brand、總10 inbox、30座席、100萬訊息、5萬knowledge chunks；用惡意同名/同ID關聯資料測隔離。</p>
+<p><strong>負載目標</strong>：1,000個連線訪客、30個座席、10則新訊息/秒、10個同時AI工作；30分鐘穩態加2倍5分鐘突發。非模型API p95&lt;500ms、同區域已持久化訊息推送p95&lt;1s、zero跨租戶洩漏/已接受訊息遺失/重複final publication。達不到就記錄瓶頸與調整，不能只降低測試量宣布成功。</p>
+<p><strong>知識評測</strong>：至少150題本地真實客服題作第一版起點，含正常/例外/繁簡體/拼字/無答案/越權/提示注入/過期資料。所有高風險與越權案例必須阻擋；普通答案依人工標註正確、來源支持、應否轉人工分開評分。正確率門檻由資料負責人批准，不用 LLM 自評取代人工標註。</p>
+<hr />
+<h2 id="spec-heading-63">19. 首版完成定義</h2>
+<p>M0–M3 的必測項目全部通過；真實PG/Redis並發測試，不以SQLite取代；至少一個真實聊天供應商與一個embedding profile完成驗證，其他宣稱支援的協定需有fixture contract test，未帶key實測者明確標記「未完成實機驗證」。</p>
+<p>三套畫面可操作：前台可問答/轉人工、客服可處理/結案、運營可設定/發布/授權。JS SDK有可用示範網站與宿主後端身分交換說明。OpenAPI與實際route、request/response一致，所有secret不出現在前端。</p>
+<p>交付部署/升級/回滾/備份/還原/事故手冊、權限與威脅測試、固定評測集、效能結果、套件license清單和已知限制。沒有完成真實第三方平台驗證，不得在UI顯示「已支援/已連線」。</p>
+<p><strong>最後決策：先把人工客服當成獨立可用的產品，再接入受控AI；AI只是可替換的接待角色，不是權限與狀態的決策中心。</strong></p>
+<hr />
+<h2 id="spec-heading-64">20. 外部依據與限制</h2>
+<p>完整官方來源與查核日期見 <code>REFERENCES.md</code>。技術事實引用以 [Rxx] 標記；其他 MUST、流程、預設值與里程碑均為本案設計決策。</p>
+<p>Laravel AI SDK可統一多供應商，但不能由此推論每個模型功能相同。OpenAI PHP客戶端列於官方社群庫而非官方PHP SDK；Anthropic已有官方PHP SDK但本次查核文件仍註明beta；Google目前官方GenAI語言清單未列PHP，因此本案不要求三家都有官方PHP SDK才可接入 [R02][R09][R10][R11]。</p>
+<p>套件官方/第一方不等於永遠沒有bug。實作者必須在M0記錄確切版本、release狀態、授權、依賴及已知相容性；SDK/供應商API變動只限adapter層處理，不擴散到conversation domain。</p>
+</section><section class="document" id="doc-data"><div class="eyebrow">DATA_MODEL.md</div><h1 id="data-heading-1">資料模型、索引與一致性規格</h1>
+<p>版本1.0.0；與 <code>SPEC.md</code> 共同閱讀。以下是要實作的 schema contract，不是可直接套到既有正式資料庫的 migration。</p>
+<h2 id="data-heading-2">1. 共通約定</h2>
+<p>所有外部ID使用UUID字串；新ID建議由應用產生UUIDv7，但<strong>對話內排序只依序號</strong>。除 <code>users</code> / <code>workspaces</code> 及必要global tables外，業務表皆含 <code>workspace_id</code>。時間用 <code>timestamptz</code>；狀態採varchar + CHECK（便於部署演進）；金額numeric，不用float。<code>jsonb</code>只裝可變metadata/config，不用來隱藏主要關聯、權限、分派或唯一鍵。</p>
+<p>租戶表以 <code>PRIMARY KEY(id)</code> 加 <code>UNIQUE(workspace_id,id)</code>，子表使用 composite FK 到父表的 <code>(workspace_id,id)</code>；需要brand/inbox一致性時另外建立對應複合唯一鍵及FK。單純為每張表加workspace_id，卻仍只用parent_id外鍵，無法防止跨workspace關聯。</p>
+<p>可由API PATCH的設定資源另有version bigint（初始0），更新必須CAS；immutable版本/append-only事件不適用此PATCH規則。Created/updated欄位依表需要；事件、稽核、已發布知識版本與訊息採append-only。刪除是受控purge/redaction程序，非所有表一律soft delete。</p>
+<h2 id="data-heading-3">2. 租戶、品牌、人員與權限</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+  <th>表</th>
+  <th>核心欄位（未列出者依共通約定）</th>
+  <th>重要約束</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>workspaces</td>
+  <td>id,name,slug,timezone,status,settings,knowledge_generation</td>
+  <td>slug唯一；knowledge_generation bigint從0開始</td>
+</tr>
+<tr>
+  <td>users</td>
+  <td>id,email_normalized,password_hash,name,mfa_secret_ref,status</td>
+  <td>email唯一；MFA secret不回API</td>
+</tr>
+<tr>
+  <td>workspace_memberships</td>
+  <td>workspace_id,user_id,display_name,status</td>
+  <td>unique(workspace_id,user_id)；對話assignee指向membership，不直接指global user</td>
+</tr>
+<tr>
+  <td>brands</td>
+  <td>workspace_id,name,slug,status,settings</td>
+  <td>unique(workspace_id,slug)</td>
+</tr>
+<tr>
+  <td>inboxes</td>
+  <td>workspace_id,brand_id,name,public_key,channel_type,status,ai_mode,ai_profile_id,business_hours_id,settings</td>
+  <td>public_key全域唯一且不可枚舉；unique(workspace_id,brand_id,id)</td>
+</tr>
+<tr>
+  <td>inbox_origins</td>
+  <td>workspace_id,inbox_id,origin</td>
+  <td>normalized scheme+host+port；不接受任意regex/wildcard</td>
+</tr>
+<tr>
+  <td>teams</td>
+  <td>workspace_id,name,status</td>
+  <td>unique(workspace_id,name)</td>
+</tr>
+<tr>
+  <td>team_memberships</td>
+  <td>workspace_id,team_id,membership_id</td>
+  <td>pair唯一，父FK皆workspace-aware</td>
+</tr>
+<tr>
+  <td>inbox_teams</td>
+  <td>workspace_id,inbox_id,team_id</td>
+  <td>pair唯一</td>
+</tr>
+<tr>
+  <td>inbox_memberships</td>
+  <td>workspace_id,inbox_id,membership_id</td>
+  <td>明確座席權限範圍；role授權仍須檢查</td>
+</tr>
+<tr>
+  <td>roles</td>
+  <td>workspace_id,key,name,is_system_template</td>
+  <td>unique(workspace_id,key)</td>
+</tr>
+<tr>
+  <td>permissions</td>
+  <td>code,description</td>
+  <td>global唯讀權限目錄</td>
+</tr>
+<tr>
+  <td>role_permissions</td>
+  <td>workspace_id,role_id,permission_code</td>
+  <td>pair唯一</td>
+</tr>
+<tr>
+  <td>role_bindings</td>
+  <td>workspace_id,membership_id,role_id,scope_type,scope_id</td>
+  <td>scope=workspace/brand/inbox/team；scope_id依類型驗證；多型FK由service+測試補足</td>
+</tr>
+<tr>
+  <td>agent_capacity</td>
+  <td>workspace_id,membership_id,max_active,last_assigned_at</td>
+  <td>unique(workspace_id,membership_id)；分派交易鎖定此row；活躍數由案件查詢計算或交易內同步</td>
+</tr>
+<tr>
+  <td>business_hours</td>
+  <td>workspace_id,timezone,weekly_schedule,holidays</td>
+  <td>JSON schema驗證；禁止client提供未驗證timezone</td>
+</tr>
+<tr>
+  <td>sessions（Laravel原生）</td>
+  <td>id,user_id,ip_address,user_agent,payload,last_activity</td>
+  <td>保持framework driver格式；啟用session payload加密，嚴格限制DB/log存取</td>
+</tr>
+<tr>
+  <td>staff_session_security</td>
+  <td>id,user_id,session_id_digest,expires_at,revoked_at,session_generation</td>
+  <td>使用獨立UUID作fanout識別；不把cookie/token原文用作channel名稱</td>
+</tr>
+</tbody>
+</table></div>
+<p>Presence（多分頁session、心跳、available/away）可暫存Redis，但staff啟用狀態與授權永遠以DB為準。不得把離線誤當撤銷權限。</p>
+<h2 id="data-heading-4">3. 客戶、session與身分</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+  <th>表</th>
+  <th>核心欄位</th>
+  <th>重要約束</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>contacts</td>
+  <td>workspace_id,brand_id,name,email_encrypted,phone_encrypted,attributes,status</td>
+  <td>brand必填；敏感欄位分權限序列化</td>
+</tr>
+<tr>
+  <td>contact_identities</td>
+  <td>workspace_id,brand_id,contact_id,issuer,subject,verified_at</td>
+  <td>unique(workspace_id,brand_id,issuer,subject)；不能靠email merge</td>
+</tr>
+<tr>
+  <td>identity_issuers</td>
+  <td>workspace_id,brand_id,key_id,issuer,inbox_scope,secret_ref,status</td>
+  <td>issuer+key_id唯一；固定演算法與audience</td>
+</tr>
+<tr>
+  <td>identity_exchanges</td>
+  <td>workspace_id,issuer_id,jti_hash,request_hash,session_id,expires_at</td>
+  <td>unique(issuer_id,jti_hash)，原子consume；若提供冪等response含token則短期加密儲存</td>
+</tr>
+<tr>
+  <td>visitor_sessions</td>
+  <td>workspace_id,brand_id,inbox_id,contact_id,identity_level,token_hash,refresh_hash,expires_at,refresh_expires_at,revoked_at,session_generation</td>
+  <td>只能屬於一個brand/inbox；access/refresh分離，rotation有reuse檢查</td>
+</tr>
+<tr>
+  <td>visitor_refresh_tokens</td>
+  <td>workspace_id,session_id,family_id,token_hash,replaced_by,used_at,expires_at,revoked_at</td>
+  <td>hash唯一；保留旋轉歷史以偵測舊token reuse，不只存目前hash</td>
+</tr>
+<tr>
+  <td>customer_attributes</td>
+  <td>workspace_id,key,type,visibility,editable_by_visitor,validation_rules</td>
+  <td>來源可信等級固定；verified/VIP/餘額不可由visitor修改</td>
+</tr>
+<tr>
+  <td>contact_merge_events</td>
+  <td>workspace_id,brand_id,source_contact_id,target_contact_id,conversation_id,actor_id,reason</td>
+  <td>首版只有明確授權的匿名目前對話合併；不跨品牌</td>
+</tr>
+</tbody>
+</table></div>
+<p>識別內容使用加密或最少化；需要以Email搜尋時，可另外用帶伺服器key的normalized lookup digest，不以可暴力猜測的無salt hash當隱私保護。</p>
+<h2 id="data-heading-5">4. 對話與訊息</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+  <th>表</th>
+  <th>核心欄位</th>
+  <th>重要約束</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>conversations</td>
+  <td>workspace_id,brand_id,inbox_id,contact_id,status,handling_mode,assignee_id,team_id,version,answer_epoch,next_message_seq,public_event_seq,staff_event_seq,latest_customer_message_id,last_customer_message_at,last_message_at,resolved_at,resolution_code,resolution_cycle,wake_at,related_conversation_id</td>
+  <td>version/answer_epoch從0開始；next_message_seq從1開始，event counters從0開始；CAS和row lock；brand/inbox/contact一致</td>
+</tr>
+<tr>
+  <td>messages</td>
+  <td>workspace_id,conversation_id,message_seq,author_type,staff_membership_id,contact_id,ai_run_id,visibility,kind,body_text,client_message_id,source_scope,external_message_id,created_at,redacted_at</td>
+  <td>unique(conversation_id,message_seq)；unique(workspace_id,source_scope,client_message_id) where非null；unique(ai_run_id) where非null；unique(workspace_id,source_scope,external_message_id) where非null</td>
+</tr>
+<tr>
+  <td>message_attachments</td>
+  <td>workspace_id,message_id,file_id,position</td>
+  <td>同workspace及可見性檢查；clean檔案才能attach</td>
+</tr>
+<tr>
+  <td>message_redactions</td>
+  <td>workspace_id,message_id,actor_type,actor_id,reason,created_at</td>
+  <td>保留事件、不保留已要求刪除的原文複本</td>
+</tr>
+<tr>
+  <td>conversation_assignments</td>
+  <td>workspace_id,conversation_id,from_assignee_id,to_assignee_id,team_id,reason,actor_id,forced,created_at</td>
+  <td>append-only</td>
+</tr>
+<tr>
+  <td>conversation_reads</td>
+  <td>workspace_id,conversation_id,reader_type,reader_id,last_read_message_seq,read_at</td>
+  <td>unique(conv,reader_type,reader_id)；只允許單調遞增，不能超出可見最新seq</td>
+</tr>
+<tr>
+  <td>conversation_tags</td>
+  <td>workspace_id,conversation_id,tag_id</td>
+  <td>pair唯一</td>
+</tr>
+<tr>
+  <td>tags</td>
+  <td>workspace_id,name,color_token</td>
+  <td>unique(workspace_id,name)</td>
+</tr>
+<tr>
+  <td>macros</td>
+  <td>workspace_id,brand_id,title,body_template,allowed_variables,status</td>
+  <td>scope授權；不允許eval</td>
+</tr>
+<tr>
+  <td>csat_responses</td>
+  <td>workspace_id,conversation_id,resolution_cycle,score,comment,contact_id,submitted_at</td>
+  <td>unique(conversation_id,resolution_cycle)；分數1–5</td>
+</tr>
+<tr>
+  <td>audit_logs</td>
+  <td>workspace_id,actor_type,actor_id,action,resource_type,resource_id,scope,request_id,ip_digest,reason,before_safe,after_safe,created_at</td>
+  <td>append-only；secret不可入before/after</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>message_seq</code>、event_seq、version在JSON用十進位字串，DB用bigint。讀取訊息以 <code>message_seq</code> keyset pagination，不以OFFSET處理長歷史。</p>
+<h3 id="data-heading-6">狀態CHECK（概念SQL）</h3>
+<pre><code class="language-sql">CHECK (status IN ('open','waiting_customer','snoozed','resolved'));
+CHECK (handling_mode IN ('ai','human_queue','human'));
+CHECK (
+  status = 'resolved'
+  OR (handling_mode IN ('ai','human_queue') AND status='open' AND assignee_id IS NULL)
+  OR (handling_mode='human' AND assignee_id IS NOT NULL)
+);
+CHECK ((status='snoozed') = (wake_at IS NOT NULL));
+</code></pre>
+<p>解析resolved案件時清除wake_at。Resolved可以保留assignee/mode作歷史，但任何新的公開message必須走重開規則。新對話resolution_cycle從1開始，重開需遞增resolution_cycle；已結案超過72小時的原conversation POST訊息回<code>409 NEW_CONVERSATION_REQUIRED</code>，SDK以related_conversation_id新建後重送原draft，不能把訊息悄悄放到另一對話而不告知caller。</p>
+<h3 id="data-heading-7">併發新增訊息（流程，不是完整可貼上SQL）</h3>
+<ol>
+<li>Authenticate、Policy、驗證body與檔案權限。</li>
+<li>transaction內reserve idempotency key並確認request hash。</li>
+<li><code>SELECT ... FROM conversations WHERE workspace_id=? AND id=? FOR UPDATE</code>。</li>
+<li>驗證狀態；取得並增加<code>next_message_seq</code>；新增message。</li>
+<li>Visitor輸入更新latest_customer_message_id、answer_epoch；已resolved依規則重開或回衝突。</li>
+<li>建立public/staff projection event；必要時建立async task；更新idempotent result。</li>
+<li>commit，回傳持久化message DTO。Queue/WS失敗不改寫此結果。</li>
+</ol>
+<p>唯一鍵競爭不能一律顯示500：同client_message_id、同body應回原message，不同body回409。DB transaction rollback後才重新讀取衝突row，避免在PostgreSQL已abort的transaction繼續查詢。</p>
+<h2 id="data-heading-8">5. 知識與向量</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+  <th>表</th>
+  <th>核心欄位</th>
+  <th>約束</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>knowledge_bases</td>
+  <td>workspace_id,brand_id,name,default_locale,status,active_embedding_profile_id</td>
+  <td>inbox可綁多KB；不跨brand默認共享</td>
+</tr>
+<tr>
+  <td>inbox_knowledge_bases</td>
+  <td>workspace_id,inbox_id,knowledge_base_id,priority</td>
+  <td>pair唯一</td>
+</tr>
+<tr>
+  <td>knowledge_documents</td>
+  <td>workspace_id,knowledge_base_id,title,source_type,source_ref,external_key,published_version_id,status</td>
+  <td>external_key同KB唯一（有值時）</td>
+</tr>
+<tr>
+  <td>knowledge_versions</td>
+  <td>workspace_id,document_id,version_number,state,visibility,locale,body_text,source_file_id,content_hash,effective_from,effective_to,created_by,approved_by,published_at</td>
+  <td>unique(document_id,version_number)；published指標只能指同文件ready/published版本</td>
+</tr>
+<tr>
+  <td>knowledge_chunks</td>
+  <td>workspace_id,version_id,chunk_index,title_path,text,source_locator,content_hash,token_count,search_text</td>
+  <td>unique(version_id,chunk_index)；chunk不自行帶可被覆寫的授權邏輯</td>
+</tr>
+<tr>
+  <td>knowledge_keywords</td>
+  <td>workspace_id,version_id,keyword_normalized,kind</td>
+  <td>FAQ aliases/精確碼/人工標籤；語意與keyword結果皆先授權</td>
+</tr>
+<tr>
+  <td>embedding_profiles</td>
+  <td>workspace_id,connection_id,model_id,dimensions,metric,normalization,task_type,configuration_version,status</td>
+  <td>immutable設定；unique(workspace_id,id,dimensions)</td>
+</tr>
+<tr>
+  <td>knowledge_embeddings</td>
+  <td>workspace_id,chunk_id,embedding_profile_id,dimensions,embedding vector,created_at</td>
+  <td>unique(chunk_id,embedding_profile_id)；dims CHECK + composite FK profile dimensions</td>
+</tr>
+<tr>
+  <td>knowledge_index_builds</td>
+  <td>workspace_id,knowledge_base_id,profile_id,state,total_chunks,indexed_chunks,failed_chunks,task_id,error_code</td>
+  <td>不完整build不得activate</td>
+</tr>
+<tr>
+  <td>knowledge_evaluations</td>
+  <td>workspace_id,knowledge_base_id,question,expected_answer,expected_source_ids,expected_action,classification,approved_by</td>
+  <td>不混入未去識別真實聊天</td>
+</tr>
+<tr>
+  <td>knowledge_evaluation_runs</td>
+  <td>workspace_id,dataset_version,profile_snapshot,results,created_by,created_at</td>
+  <td>保存原始逐題結果及人工評分版本</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="data-heading-9">可實作的向量結構策略</h3>
+<p>首版採<strong>同一邏輯表 + immutable embedding profile + vector不固定維度</strong>，應用查詢永遠帶單一profile。向量維度用 <code>CHECK(vector_dims(embedding)=dimensions)</code>，並以 <code>(workspace_id,embedding_profile_id,dimensions)</code> 外鍵對應profile。禁止不同模型同維度混用。</p>
+<p>資料量少先用精確檢索。需要ANN時，由受控migration/維運command為單一profile建立partial expression index；不能讓一般後台使用者輸入SQL/索引名稱。下面只是示意，UUID/維度由可信profile資料生成與嚴格驗證：</p>
+<pre><code class="language-sql">-- illustration only: replace the UUID with an approved profile, dimensions with its tested value.
+CREATE INDEX knowledge_embeddings_profile_hnsw
+ON knowledge_embeddings USING hnsw ((embedding::vector(1536)) vector_cosine_ops)
+WHERE embedding_profile_id = '11111111-1111-4111-8111-111111111111';
+</code></pre>
+<p>查詢expression/predicate必須與索引匹配。超過vector ANN維度上限時，依模型支援採較低維輸出或經評測的halfvec expression index；不能直接截斷任意向量。<code>CREATE INDEX CONCURRENTLY</code>不能在一般migration transaction內執行，發布流程需另安排。</p>
+<p>FAQ/source發布交易：確認全version chunks對active profile有embedding、無pending scan → 更新published_version_id/state → 增加workspace knowledge_generation → 保存event。對外回覆commit再次檢查generation，以防引用剛撤下資料。</p>
+<h2 id="data-heading-10">6. AI設定、執行與費用</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+  <th>表</th>
+  <th>核心欄位</th>
+  <th>約束</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>provider_connections</td>
+  <td>workspace_id,name,vendor,protocol,base_url,api_version,secret_ref,headers_safe,egress_policy_id,status,configuration_version</td>
+  <td>protocol enum與vendor分開；headers不能用來覆蓋host/內部安全限制</td>
+</tr>
+<tr>
+  <td>ai_models</td>
+  <td>workspace_id,connection_id,external_model_id,capabilities,context_limit,output_limit,verified_at,verification_state</td>
+  <td>unique(connection_id,external_model_id)；capability是驗證結果不是猜測</td>
+</tr>
+<tr>
+  <td>ai_profiles</td>
+  <td>workspace_id,name,chat_model_id,embedding_profile_id,rerank_model_id,prompt_version,temperature,limits,fallback_policy,data_policy,configuration_version</td>
+  <td>chat/embedding/rerank解耦；不支援的參數不可硬送</td>
+</tr>
+<tr>
+  <td>ai_runs</td>
+  <td>workspace_id,conversation_id,kind,answer_epoch,trigger_message_id,knowledge_generation,configuration_version,state,task_id,lease_token,deadline_at,started_at,finished_at,final_message_id,failure_code,handoff_reason</td>
+  <td>unique(conv,answer_epoch,kind)僅autopilot；assist要有獨立requestid；final message唯一</td>
+</tr>
+<tr>
+  <td>ai_attempts</td>
+  <td>workspace_id,run_id,attempt_no,connection_id,model_id,request_id_safe,latency_ms,input_tokens,output_tokens,cached_tokens,usage_state,cost_estimate,currency,error_code</td>
+  <td>unique(run_id,attempt_no)；usage未知不能計0</td>
+</tr>
+<tr>
+  <td>ai_run_sources</td>
+  <td>workspace_id,run_id,chunk_id,source_label,rank,score,profile_snapshot</td>
+  <td>保存引用與重播所需版本metadata；原始provider思考文字不保存</td>
+</tr>
+<tr>
+  <td>tool_executions</td>
+  <td>workspace_id,run_id,tool_key,actor_scope,input_safe,result_safe,state,external_request_id,started_at,finished_at</td>
+  <td>sensitive fields遮罩；沒有任意工具名執行</td>
+</tr>
+<tr>
+  <td>usage_budgets</td>
+  <td>workspace_id,brand_id,inbox_id,period,currency,limit_amount,reserved_amount,spent_amount</td>
+  <td>transaction下預留與結算；強制停止策略；未知成本保守估計</td>
+</tr>
+</tbody>
+</table></div>
+<p>Autopilot unique應使用partial unique index <code>WHERE kind='autopilot'</code>，assist草稿允許多次但每次request id去重。人工接手只取消autopilot，不必刪掉已提供給客服的草稿。</p>
+<h2 id="data-heading-11">7. 任務、事件、渠道與串接</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+  <th>表</th>
+  <th>核心欄位</th>
+  <th>約束</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>async_tasks</td>
+  <td>workspace_id,type,entity_id,dedupe_key,state,queue_name,attempt_count,not_before,lease_token,lease_expires_at,queued_at,started_at,deadline_at,error_code</td>
+  <td>unique(workspace_id,dedupe_key)；worker需CAS claim；重投不改taskid</td>
+</tr>
+<tr>
+  <td>outbox_events</td>
+  <td>workspace_id,event_id,event_type,aggregate_type,aggregate_id,payload_safe,occurred_at,state,lease_token,lease_expires_at</td>
+  <td>event_id全域唯一；payload/敏感projection最小化</td>
+</tr>
+<tr>
+  <td>realtime_events</td>
+  <td>workspace_id,conversation_id,audience,event_seq,event_id,type,payload,created_at</td>
+  <td>unique(conversation_id,audience,event_seq)；audience=public/staff；前台不查staff</td>
+</tr>
+<tr>
+  <td>channel_connectors</td>
+  <td>workspace_id,brand_id,inbox_id,type,public_key,secret_ref,capabilities,settings,health,status</td>
+  <td>connector與inbox一對一或明確受控一對多；MVP用一對一</td>
+</tr>
+<tr>
+  <td>channel_threads</td>
+  <td>workspace_id,connector_id,external_thread_id,contact_id,conversation_id,metadata_safe</td>
+  <td>unique(connector_id,external_thread_id,conversation_id)；是否續用依重開規則</td>
+</tr>
+<tr>
+  <td>inbound_events</td>
+  <td>workspace_id,connector_id,external_event_id,body_hash,raw_payload_ref,state,received_at,processed_at</td>
+  <td>unique(connector_id,external_event_id)；原始payload短期加密</td>
+</tr>
+<tr>
+  <td>channel_deliveries</td>
+  <td>workspace_id,message_id,connector_id,state,external_message_id,attempt_count,last_error_code,last_attempt_at</td>
+  <td>unique(message_id,connector_id)；sending/sent/delivered/read/failed/unknown</td>
+</tr>
+<tr>
+  <td>delivery_attempts</td>
+  <td>workspace_id,delivery_id,attempt_no,request_id_safe,response_code,result_state,created_at</td>
+  <td>unknown代表可能已送達，無外部冪等不能盲重送</td>
+</tr>
+<tr>
+  <td>api_clients</td>
+  <td>workspace_id,name,token_prefix,token_hash,scopes,brand_scope,inbox_scope,allowed_ips,expires_at,status</td>
+  <td>token只顯示一次；不以public_key當secret</td>
+</tr>
+<tr>
+  <td>webhook_endpoints</td>
+  <td>workspace_id,url,secret_ref,key_id,event_types,scope,status</td>
+  <td>必須通過egress policy；不訂閱未授權事件</td>
+</tr>
+<tr>
+  <td>webhook_deliveries</td>
+  <td>workspace_id,endpoint_id,event_id,state,attempt_count,next_attempt_at,last_status,last_error</td>
+  <td>unique(endpoint_id,event_id)</td>
+</tr>
+<tr>
+  <td>webhook_attempts</td>
+  <td>workspace_id,delivery_id,attempt_no,signed_at,http_status,duration_ms,response_excerpt_safe</td>
+  <td>每次重送新timestamp，不保存secret</td>
+</tr>
+<tr>
+  <td>idempotency_records</td>
+  <td>workspace_id,principal_scope,method,route_fingerprint,key,request_hash,response_status,response_encrypted_or_safe,expires_at</td>
+  <td>複合unique；只在安全重試需要時短期加密token回應</td>
+</tr>
+</tbody>
+</table></div>
+<p>Inbound webhook只有在簽章通過且DB持久化完成後才能2xx。回覆payload去重、outbound delivery dedupe與HTTP idempotency是不同層，不可只實作其中一層便宣稱不重複。</p>
+<h2 id="data-heading-12">8. 檔案與資料治理</h2>
+<p><code>files</code>：workspace_id、brand_id、owner_type/id、purpose(chat/knowledge/export)、object_key、sha256、declared_mime、detected_mime、bytes、scan_state、scan_result_safe、created_at、deleted_at；object key不可由caller任意指定。</p>
+<p><code>data_erasure_requests</code>：scope、requested_by、approved_by、state、started_at、completed_at、backup_tombstone_ref。</p>
+<p><code>export_jobs</code>：requester、授權scope快照、query、taskid、fileid、expires_at。下載前重查目前權限，不只信任產檔當時的權限。</p>
+<h2 id="data-heading-13">9. 核心索引清單</h2>
+<ul>
+<li>conversations(workspace_id,inbox_id,status,last_message_at DESC,id)；(workspace_id,assignee_id,status)；(workspace_id,handling_mode,status,created_at)。</li>
+<li>messages(conversation_id,message_seq) unique；source/client id unique；AI run final unique。</li>
+<li>realtime_events(conversation_id,audience,event_seq) unique。</li>
+<li>contacts(workspace_id,brand_id,id)；contact_identities scoped unique。</li>
+<li>knowledge_versions(document_id,version_number)；knowledge_chunks(version_id,chunk_index)；embeddings(profile_id,chunk_id)。</li>
+<li>inbound_events(connector_id,external_event_id)；outbox_events(state,occurred_at)；async_tasks(state,not_before,lease_expires_at)。</li>
+<li>webhook_deliveries(state,next_attempt_at)；ai_runs(state,deadline_at)。</li>
+<li>所有高流量FK查詢需評估索引；不把每個jsonb欄位都先建巨大GIN。</li>
+</ul>
+<h2 id="data-heading-14">10. Migration順序與注意</h2>
+<p>先global/users/workspaces → membership/brand/inbox → permissions/teams → contacts/identities/sessions → conversations（nullable pointers） → tasks/AI設定/knowledge → messages/ai_runs → 補雙向nullable FK → events/channel/integration → files/治理/報表。</p>
+<p>knowledge_documents.published_version_id、conversations.latest_customer_message_id、ai_runs.final_message_id等循環引用先建欄位，再建FK。用transaction內更新確保指向正確aggregate；需要的composite FK不能因為migration困難而省略。</p>
+<p>持久化測試必須在PostgreSQL真實執行：獨立連線並行接單、人工接手/AI commit、兩個workspace混插FK、duplicate event與重新投遞。不得以SQLite通過作為驗收。</p>
+</section><section class="document" id="doc-ai"><div class="eyebrow">AI_ADAPTERS.md</div><h1 id="ai-heading-1">AI供應商與檢索模組規格</h1>
+<h2 id="ai-heading-2">1. 設計邊界</h2>
+<p>業務層只認 <code>ChatGateway</code>、<code>EmbeddingGateway</code>、<code>RerankGateway</code>、<code>KnowledgeRetriever</code>、<code>ToolBroker</code>，不依賴任何vendor response class。第一個具體實作為 <code>LaravelAiAdapter</code>；缺少功能時，以其他維護中的library/原生HTTP transport實作同一契約，不讓Controller出現一排vendor if/else。</p>
+<p>不建立另一套Dify/Agent SaaS作必須依賴；未來可把外部工作流接成新的Gateway，但仍受同樣授權、知識scope、deadline與交接控制。</p>
+<h2 id="ai-heading-3">2. SDK選用查核（2026-09-26）</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+  <th>選項</th>
+  <th>本次官方文件狀態</th>
+  <th>本案決策</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Laravel <code>laravel/ai</code></td>
+  <td>Laravel第一方統一SDK，有OpenAI/Anthropic/Gemini及自訂endpoint；能力依provider而異 [R02]</td>
+  <td>優先；M0鎖版本、驗證實際協定，不假設涵蓋vendor每個新功能</td>
+</tr>
+<tr>
+  <td>OpenAI <code>openai-php/client</code></td>
+  <td>OpenAI官方library頁列為community library，不是OpenAI官方PHP SDK [R09]</td>
+  <td>Laravel adapter不足時的候選，先核對release/維護/安全公告</td>
+</tr>
+<tr>
+  <td>Anthropic <code>anthropic-ai/sdk</code></td>
+  <td>官方PHP SDK，文件仍標示beta [R10]</td>
+  <td>可選，但不因「官方」忽略beta風險；封裝、鎖版、測試後再用</td>
+</tr>
+<tr>
+  <td>Gemini</td>
+  <td>Google官方GenAI清單本次未列PHP [R11]</td>
+  <td>優先Laravel adapter；必要時用有維護證據的PHP library或受測HTTP adapter，不虛構官方PHP SDK</td>
+</tr>
+</tbody>
+</table></div>
+<p>本規格未對任何特定Composer修補版本做實機測試。M0須交付dependency matrix，註明package、version、license、最低PHP、維護來源、protocol支持、fixture與live test狀態。不要一次引入三套SDK只為「看起來完整」。</p>
+<h2 id="ai-heading-4">3. Protocol與model能力</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+  <th>protocol</th>
+  <th>主要格式</th>
+  <th>相容性最低要求</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>openai_responses</td>
+  <td><code>/v1/responses</code>的input/output items</td>
+  <td>文字生成、error mapping、usage；streaming/tools/structured output另驗證 [R18]</td>
+</tr>
+<tr>
+  <td>openai_chat_completions</td>
+  <td><code>/v1/chat/completions</code>的messages/choices</td>
+  <td>文字生成；相容服務的tools/JSON/usage/模型參數可能不同，逐一宣告</td>
+</tr>
+<tr>
+  <td>anthropic_messages</td>
+  <td><code>/v1/messages</code>的content blocks、獨立system</td>
+  <td>正確content block、stop reason、usage；不能把thinking block當回答</td>
+</tr>
+<tr>
+  <td>gemini_generate_content</td>
+  <td>models generateContent/streamGenerateContent、contents/parts</td>
+  <td>正確role/parts、finish reason、safety/empty response；Gemini原生格式非OpenAI格式 [R19]</td>
+</tr>
+</tbody>
+</table></div>
+<p>Provider connection記錄vendor與protocol兩個欄位。例如vendor=&quot;private_gateway&quot;、protocol=&quot;openai_chat_completions&quot;。Base URL是否含/v1由adapter規約固定；禁止曖昧拼接成/v1/v1。URL驗證後才可測試連線；自訂headers走allowlist，secret在服務端注入。</p>
+<p>每個model有capabilities：text、stream、json_schema、tools、vision、embeddings、rerank、cancellation、usage、context_limit、max_output。設定頁以capability決定可設定欄位，不支援時回<code>CAPABILITY_UNSUPPORTED</code>，不得偷偷忽略。</p>
+<p>Anthropic聊天不代表它提供embedding。Embedding/rerank可選不同供應商，並各自接受資料處理政策檢查；不能因Chat選Claude就自動填入不存在的Claude embedding endpoint。</p>
+<h2 id="ai-heading-5">4. 內部DTO契約</h2>
+<p>以下為應實作的領域契約，名稱是本案自訂，不是假裝SDK已有相同class。</p>
+<h3 id="ai-heading-6">ChatRequest</h3>
+<ul>
+<li>request_id、workspace_id、actor_context_id、run_id、deadline_at。</li>
+<li>connection/model/profile的immutable snapshot，非model名稱一個字串而已。</li>
+<li>system_policy（本地版控）、conversation messages（role/content segments）、retrieved_sources。</li>
+<li>output_schema（可選）、tool_definitions（白名單）、max_output_tokens與經capability允許的options。</li>
+<li>data_policy：allowed_destinations、sensitive_fields_redacted、fallback_allowed。</li>
+<li>cancellation callback/token；不把secret放到可log/序列化DTO。</li>
+</ul>
+<h3 id="ai-heading-7">ChatResult</h3>
+<ul>
+<li>text、finish_reason(normalized)、source_refs、tool_calls、provider_request_id_safe。</li>
+<li>usage(input/output/cached token + <code>known | estimated | unavailable</code>)；禁止把未知當0。</li>
+<li>model_id、connection_id、latency、warnings。</li>
+<li>不返回可公開的raw response；raw provider payload只在獨立短期加密debug選項存在。</li>
+</ul>
+<h3 id="ai-heading-8">StreamEvent</h3>
+<p><code>started | text_delta | tool_call_delta | usage | completed | refused | failed</code>。</p>
+<p>外部delta只在adapter內正規化，UTF-8、SSE chunk邊界與JSON fragments需測試。供應商串流支援不等於一定要對訪客逐token公開。首版autopilot全量buffer + validation + atomic publish；客服草稿可串流。若未來對外開啟provisional stream，需明確承認已送達token不能回收，並另設UI協定/安全驗收。</p>
+<h3 id="ai-heading-9">EmbeddingRequest / Result</h3>
+<p>input_texts、profile_id、model_id、requested_dimensions（僅模型支援時）、task_type、deadline。</p>
+<p>Result為對應相同順序的finite float vectors、實際dimensions、usage。回傳長度、維度、NaN/Inf、空字串策略不符即失敗；不以全零向量補救。query embedding與document embedding必須用相容的同profile/task規則。</p>
+<h3 id="ai-heading-10">RerankRequest / Result</h3>
+<p>query + 已授權candidate IDs/texts + top_n → candidate IDs/score/order。不得返回原candidate之外的id；錯誤可按profile配置退回原始排序，但必須記錄 degraded。</p>
+<h2 id="ai-heading-11">5. ToolBroker與結構化結果</h2>
+<p>Autopilot內部建議結果schema：</p>
+<pre><code class="language-json">{
+  &quot;action&quot;: &quot;answer&quot;,
+  &quot;answer&quot;: &quot;依目前規則，您可以從會員中心查看案件進度。&quot;,
+  &quot;source_refs&quot;: [&quot;S1&quot;],
+  &quot;handoff_reason&quot;: null
+}
+</code></pre>
+<p>action只允許 <code>answer | clarify | handoff</code>。由程式驗證schema、引用集合、字數/連結、政策與對話epoch；模型沒有直接修改conversation/assignee/status的權限。原生structured output不支援時可用明確文字格式+parser，但invalid輸出不得直接給訪客；此降級能力須有測試並可停用。</p>
+<p>ToolBroker每次執行都重查ActorContext：會員是否已驗證、resource是否本人、workspace/inbox是否匹配。readonly工具最多2次/AI run，總tool時間預算10秒作起點；工具回應有schema/最大bytes，不把完整會員資料或歷史訂單全部塞給LLM。</p>
+<p>Prompt injection來源可來自會員、網站文件、PDF、工具結果或社群訊息。把它們標記為data、限制工具與輸出、最小權限；不能只靠一句「忽略惡意指令」宣稱解決。</p>
+<h2 id="ai-heading-12">6. Chat生成與handoff算法</h2>
+<ol>
+<li>Receive task，CAS claim lease；確認deadline尚未到。</li>
+<li>Load當前conversation + latest_customer_message + inbox/AI設定 + authorized KB snapshot。</li>
+<li>若human/closed/kill-switch/明確requestHuman：取消AI或轉人工，不呼叫provider。</li>
+<li>檢查workspace+brand+inbox budget並預留保守成本；不同provider不得跨越data_policy。</li>
+<li>正規化query、retrieval、選取source；無足夠來源則fallback核准澄清/人工，不硬生答案。</li>
+<li>建立受限制ChatRequest，總deadline控制provider重試/工具時間。</li>
+<li>收到結果後schema/引用/finish reason檢查；stream被截斷、refusal、content_filter或max_tokens截斷都不得當成完整成功。</li>
+<li>短transaction重新檢查run/lease/epoch/latest input/generation/profile version，原子建立唯一final message與outbox。</li>
+<li>失效結果標記stale/cancelled，不發給訪客；總deadline到或不可恢復錯誤進human_queue。</li>
+<li>結算usage與budget。上游可能已計費但取消不代表退款；unknown成本需保守保留估計。</li>
+</ol>
+<p>新會員輸入把舊run變stale後，可以為新epoch建立run；不能在同一未取消run中追加不同問題造成語境錯亂。每個conversation一次最多一個有效autopilot run。</p>
+<h2 id="ai-heading-13">7. 逾時、限流與fallback</h2>
+<p>Connection timeout5秒、單次generate45秒、run總deadline90秒；至多2次provider嘗試，只有尚未對外發布且剩餘budget足夠時才重試。Retryable為網路暫時故障、429、部分5xx；400/401/403/unsupported parameter應顯示配置錯誤/告警，不以反覆重試解決。</p>
+<p>SDK內建retry可關閉或縮到明確次數，不能SDK重試3次乘上queue3次再乘fallback3家。共享併發控制按workspace+connection+model，超出時等候仍計入run deadline；轉人工永遠優先於盲等。</p>
+<p>Fallback分兩種：同provider允許的model fallback；跨provider fallback需data_policy明確同意，且目的地在allowlist。fallback仍只使用相同已授權資料，不放大歷史對話範圍；記錄實際provider/model與原因。</p>
+<p>預設聊天連續5次基礎設施失敗開circuit60秒，半開1次測試；參數可調。budget超限立即停止新auto generation，但人工客服可用；顯示真實人工服務，不把超額錯誤原文丟給會員。</p>
+<h2 id="ai-heading-14">8. Connection管理與版本安全</h2>
+<p>配置來源可選環境secret或DB中的secret_ref；後台只回masked/present，不回key原文。Workspace admin可選平台已批准的egress target；需新增內網host/port由platform operator批准。</p>
+<p>每次變更產生新configuration_version與audit；active run使用immutable snapshot，但發布前若critical設定改動/停用，必須廢止。長駐PHP環境不得以 <code>config(['ai.providers.current.key'=&gt;...])</code> 更動共用全域設定而不保證隔離；以每請求/每job instance注入相應client，並用交錯workspace A/B測試驗證。</p>
+<p>模型列表可人工填寫，因為不是每個endpoint有可靠list models API；人工填寫模型必須通過probe，UI記錄「text已驗證/embedding未驗證」，不能測一個health endpoint就把所有能力亮綠燈。</p>
+<h2 id="ai-heading-15">9. 最低測試矩陣</h2>
+<p>每個protocol至少測normal text、multi content blocks、usage缺失、invalid UTF-8邊界/stream fragments、400/401/429/500、timeout、refusal、max_tokens截斷、cancellation、unknown fields。工具/JSON/vision等只有宣稱支援時才必測；不支援需穩定回明確錯誤。</p>
+<p>至少一個真實Chat provider與一個真實Embedding profile做live smoke；沒有實際API key的供應商只標示fixture-tested。產出adapter capability report，附確切套件/模型/協定版本與測試日期。</p>
+</section><section class="document" id="doc-api"><div class="eyebrow">API_CONTRACT.md</div><h1 id="api-heading-1">HTTP、即時事件與整合契約</h1>
+<h2 id="api-heading-2">1. 契約範圍</h2>
+<p><code>contracts/openapi.yaml</code> 定義首版核心流程、主要設定資源與通用整合的OpenAPI 3.1契約。它不是已運行服務的自動匯出；實作時需做route/schema contract test，將畫面所需的其餘CRUD（巨集、標籤、報表明細等）依本文件補齊，再產生正式全量OpenAPI。不能對外宣稱尚未定義/實作的第三方平台已可使用。</p>
+<p>所有path以 <code>/api/v1</code> 為主，OpenAPI <code>servers</code> 使用佔位HTTPS域名。UUID為字串，version/seq是十進位字串；datetime UTC。非公開key不出URL。每個資源response均以專用DTO控制欄位，不直接回ORM。</p>
+<h2 id="api-heading-3">2. 三種認證</h2>
+<p><strong>Staff</strong>：<code>/ops</code>與<code>/agent</code>同站部署，Laravel session + CSRF（Sanctum/Fortify相容流程）。先GET <code>/sanctum/csrf-cookie</code>，再login；MFA challenge完成後才能取得有效session。OpenAPI中cookie <code>supportdesk_session</code>為本案配置名稱。所有staff寫入同時需要session及<code>X-XSRF-TOKEN</code>；GET不要求CSRF。API操作仍需workspace/membership/Policy。</p>
+<p><strong>Visitor</strong>：公開inbox_key bootstrap匿名session，或以宿主後端簽發的identity JWT交換。Authorization Bearer token只能存取自己brand/inbox/contact/session的資料。Refresh不以staff cookie運作。</p>
+<p><strong>Integration</strong>：後台建立的scoped token，用於服務端。所有資源scope由token與server查出的connector mapping決定，不能利用body中的workspace_id擴大權限。</p>
+<p>通用入站Webhook不是staff/integration session，用raw body HMAC + timestamp + event id驗證。LINE/Telegram等之後採各平台的驗證方式，不混用本案HMAC規格。</p>
+<h2 id="api-heading-4">3. 回應與冪等</h2>
+<p>成功：<code>{ &quot;data&quot;: &lt;resource&gt;, &quot;meta&quot;: { &quot;request_id&quot;: &quot;...&quot; } }</code>。</p>
+<p>列表：<code>{ &quot;data&quot;: [], &quot;meta&quot;: { &quot;next_cursor&quot;: null, &quot;has_more&quot;: false, &quot;request_id&quot;: &quot;...&quot; } }</code>。</p>
+<p>錯誤：</p>
+<pre><code class="language-json">{
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;VERSION_CONFLICT&quot;,
+    &quot;message&quot;: &quot;對話已由其他操作更新，請重新載入。&quot;,
+    &quot;details&quot;: { &quot;current_version&quot;: &quot;12&quot; },
+    &quot;request_id&quot;: &quot;req_example&quot;
+  }
+}
+</code></pre>
+<p>需要副作用的建立/傳送/狀態操作必須帶Idempotency-Key（UUID或至少16字元隨機值）；讀取、typing、read marker、presence用天然冪等的PUT/更新上界，可不要求key。Login/refresh亦有各自單次token與replay規則，不盲目使用包含secret的普通response cache。</p>
+<p>相同principal+method+route+key的body hash相同，回傳原結果；若body不同，409。原始回應已包含短期token者，僅可在極短期加密保存以支援可靠重試，或讓caller重新取得新一次性JWT，禁止token明文進cache/log。</p>
+<h2 id="api-heading-5">4. 首版端點群組</h2>
+<p>| 群組 | 主要路徑 | 行為 |
+|---|---|---|
+| Auth | <code>/auth/login</code>, <code>/auth/mfa/verify</code>, <code>/auth/logout</code>, <code>/me</code> | session、MFA、可用workspace |
+| Widget | <code>/widget/bootstrap</code>, <code>/widget/identity</code>, <code>/widget/token/refresh</code>, <code>/widget/logout</code> | 初始化、驗證、輪替、撤銷 |
+| Visitor conversation | <code>/widget/conversations</code>, <code>/{id}</code>, <code>/{id}/messages</code>, <code>/{id}/events</code>, <code>/{id}/snapshot</code> | 限定本人對話與public DTO |
+| Visitor actions | <code>/{id}/handoff</code>, <code>/{id}/read</code>, <code>/{id}/resolve</code>, <code>/{id}/csat</code> | 訪客要求人工、已讀、確認解決、評分 |
+| Staff conversation | <code>/workspaces/{w}/conversations</code>及<code>/{id}/messages|events|snapshot</code> | 範圍內列表/訊息/持久事件 |
+| Staff actions | <code>/{id}/claim|assign|release|resolve|reopen|snooze|resume-ai</code> | 版本/權限/容量/狀態交易 |
+| Staff AI assist | <code>/{id}/ai-drafts</code>, <code>/ai-runs/{id}</code> | 草稿不自動公開 |
+| Files | <code>/widget/files/uploads</code>, <code>/workspaces/{w}/files/uploads</code>及complete/download | 私有檔案、掃描、授權下載 |
+| Ops resource | <code>/workspaces/{w}/brands|inboxes|members|teams|roles</code> | 型別化資源設定 |
+| Knowledge | <code>/knowledge-bases</code>、<code>/knowledge-documents</code>、<code>/knowledge-versions</code>、<code>/knowledge-search</code> | 版本索引、發布與測試 |
+| AI | <code>/provider-connections</code>、<code>/ai-models</code>、<code>/embedding-profiles</code>、<code>/ai-profiles</code> | 協定/模型/能力/獨立profile |
+| Integration | <code>/api-clients</code>、<code>/webhook-endpoints</code>、<code>/webhook-deliveries</code> | credentials僅寫入、測試/重送/審計 |
+| Server API | <code>/integrations/contacts/upsert</code>、<code>/integrations/conversations</code>、<code>/.../messages|handoff</code> | Scoped機器操作 |
+| Generic webhook | <code>/hooks/{connector_key}</code> | 驗章→去重→DB保存→2xx→非同步處理 |
+| Reports/audit | <code>/reports/summary</code>、<code>/audit-logs</code>、<code>/exports</code>、<code>/async-tasks/{id}</code> | 授權範圍與非同步產檔 |</p>
+<p>除了表中已展開的核心契約，M1–M3尚須逐步補齊：邀請接受/密碼重設、MFA enrollment/recovery、staff role bindings、營業時間/假日、巨集與標籤CRUD、通知偏好、知識測試集CRUD/執行明細、CSAT報表、資料刪除審批。各頁定義見SPEC，新增API先加OpenAPI再實作。這些是已知規格展開工作，不是未經宣告的完成項目。</p>
+<h2 id="api-heading-6">5. 訊息與狀態操作規則</h2>
+<p>Visitor create message不提供author_type/contact_id/visibility/workspace_id，全部由session決定，永遠public。Staff create message需visibility(public/internal)，public必須human模式、本人assignee或具assist_other；internal需note權限，可對自己可讀案件留言。</p>
+<p>Staff變更狀態提供 <code>expected_version</code>，不符回409含current_version。不能用PATCH conversation任意寫status/assignee繞過action。</p>
+<p>已resolved案件：72小時內visitor新訊息可交易重開；超過視窗回<code>NEW_CONVERSATION_REQUIRED</code>，SDK先create related conversation再送同一draft/client_message_id。內部staff回覆需先明確reopen。Read marker只能往前，超出可見最新訊息回422。</p>
+<h3 id="api-heading-7">典型member聊天順序</h3>
+<ol>
+<li>宿主backend驗證會員 → 簽短期identity JWT。</li>
+<li>SDK bootstrap（拿到public config及匿名session，可直接identity取代匿名流程）。</li>
+<li>SDK identity交換 → 撤銷/捨棄舊匿名session，安裝新member token，不自動合併歷史。</li>
+<li>建立或載入會話 → 訂閱Reverb private channel → POST message → 取得持久化Message。</li>
+<li>接event，必要時GET events/snapshot補資料；手動requestHuman優先於AI。</li>
+<li>宿主logout呼叫SDK logout；後端撤銷訪客session，不只清除姓名。</li>
+</ol>
+<h2 id="api-heading-8">6. Reverb認證、受眾與回補</h2>
+<p>使用Laravel Echo/相容Pusher client連Reverb；Reverb app key是公開識別，app secret只在服務端。自訂auth endpoints：<code>/widget/broadcasting/auth</code>（visitor bearer）與 <code>/workspaces/{w}/broadcasting/auth</code>（staff session），body為socket_id/channel_name；response採協定要求的auth格式，不套data envelope。</p>
+<p>建議channel：</p>
+<ul>
+<li><code>private-visitor.{visitor_session_id}.conversation.{conversation_id}</code>。</li>
+<li><code>private-staff.{staff_session_id}.{membership_id}</code>，每條事件仍帶conversation_id。</li>
+</ul>
+<p>Auth需驗證session活躍、角色scope及conversation歸屬；服務端fanout只針對<strong>目前仍有效且有權限的session</strong>。不能把所有staff丟同一公共workspace channel，再靠前端藏資料；也不能認為訂閱時auth過一次，撤銷後就永遠安全。</p>
+<p>每次publish依有效session/scope fanout，快取授權最多60秒、撤銷時主動失效。Socket無法立即斷開時，也不得再送新資料到被撤銷的session channel。</p>
+<h3 id="api-heading-9">Durable event envelope</h3>
+<pre><code class="language-json">{
+  &quot;schema_version&quot;: &quot;1.0&quot;,
+  &quot;event_id&quot;: &quot;11111111-1111-4111-8111-111111111111&quot;,
+  &quot;type&quot;: &quot;conversation.updated&quot;,
+  &quot;workspace_id&quot;: &quot;22222222-2222-4222-8222-222222222222&quot;,
+  &quot;conversation_id&quot;: &quot;33333333-3333-4333-8333-333333333333&quot;,
+  &quot;event_seq&quot;: &quot;42&quot;,
+  &quot;occurred_at&quot;: &quot;2026-09-26T00:00:00Z&quot;,
+  &quot;data&quot;: {
+    &quot;conversation&quot;: {
+      &quot;id&quot;: &quot;33333333-3333-4333-8333-333333333333&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;handling_mode&quot;: &quot;human_queue&quot;,
+      &quot;version&quot;: &quot;3&quot;,
+      &quot;last_event_seq&quot;: &quot;42&quot;
+    }
+  }
+}
+</code></pre>
+<p>實際event data依type採schema定義；message.created使用完整PublicMessage或StaffMessage投影。Public event不得包含staff audit/內部備註。Public和staff的event_seq各自單調增加；型別schema見 <code>contracts/realtime-event.schema.json</code>。</p>
+<p>重連算法：保留目前conversation最後完整套用的event_seq；GET events(after_seq)，逐序/去重套用；出現缺口再補；410則GET snapshot重建。Snapshot讀取transaction內一致的conversation/最近message頁/last_event_seq，避免抓到事件較新但message較舊的混合狀態。</p>
+<p>Typing/heartbeat是ephemeral，沒有durable seq、不補播、不影響message順序，不應寫入audit每個keystroke。前台可先呈現自己HTTP回應的訊息，之後WS用message_id/client_message_id合併，不能顯示兩份。</p>
+<h2 id="api-heading-10">7. 通用Webhook</h2>
+<p>Inbound event schema：event_id、type、occurred_at、external_thread_id、external_contact(subject/name)、message(external_message_id/text/attachment_refs)。原始外部附件URL在下載前過SSRF檢查；不直接塞前台img src。</p>
+<p>驗證raw body（未重新JSON編碼前）的 <code>HMAC(secret, timestamp + '.' + raw_body)</code>，比對v1 signature；timestamp窗±300秒，event_id DB唯一，header event id必須與body event_id一致。驗證與持久化完成後回202 accepted/重複回200；簽章錯誤401，過期401，DB不可用503讓sender重送。</p>
+<p>Outbound同一事件可能多次投遞；receiver event_id去重，事件不保證跨conversation全域順序。對外只傳核准欄位，不把provider keys/visitor tokens/內部備註附在message.created裡。</p>
+<p>送出第三方平台後HTTP timeout屬<code>delivery_unknown</code>：可能已收到。若平台無冪等key/查詢API，不可自動多次重送同一答案；標示待核對，供客服處理，並保留manual resend audit。</p>
+<h2 id="api-heading-11">8. API限流起點</h2>
+<p>匿名bootstrap：每IP/每inbox 30次/10分鐘；會員identity每IP/inbox 60次/分鐘；訪客訊息每session 20則/分鐘、burst5；API client100請求/秒作上限起點；客服依操作設較高限額。IP共同出口/NAT需監控，不能把公共IP限額當唯一防護。rate limit回429帶Retry-After。</p>
+<p>附件、匯出、索引與AI probe另外限制，不可用大量probe燒預算。任何管理員設定值都需服務端上下限，不能輸入無限併發/不限制檔案大小。</p>
+</section><section class="document" id="doc-tests"><div class="eyebrow">ACCEPTANCE_TESTS.md</div><h1 id="tests-heading-1">驗收測試規格</h1>
+<p>版本1.0.0。以下為要求，<strong>不是已通過的測試結果</strong>。機器可讀版本：<code>acceptance-tests.yaml</code>。</p>
+<h2 id="tests-heading-2">測試環境與方法</h2>
+<p>後端使用Pest/PHPUnit、PostgreSQL與Redis真實服務；前端使用Vitest/Playwright。並發測試用獨立DB connection與barrier控制順序，不以大量sleep碰運氣。Provider/渠道使用可控fake HTTP server、固定fixtures與fake clock；外部實機測試獨立標記。</p>
+<p>所有blocking案例必須通過；critical主要是隔離、資料完整性與競態。每個案例回報test名稱、命令、結果與證據，不把本YAML當成測試程式。</p>
+<h2 id="tests-heading-3">安全與隔離</h2>
+<h3 id="tests-heading-4">SEC-001 · 跨workspace物件讀取（M0）</h3>
+<p><strong>Given：</strong> A/B workspace各有相同名稱的品牌與對話。<br />
+<strong>When：</strong> A token改URL/body查B conversation。<br />
+<strong>Then：</strong> 404/403；response/log/WS/統計無B內容。</p>
+<h3 id="tests-heading-5">SEC-002 · 同workspace跨品牌隔離（M0）</h3>
+<p><strong>Given：</strong> 客服只獲brand A inbox授權。<br />
+<strong>When：</strong> 搜尋/列表/報表/附件改為brand B。<br />
+<strong>Then：</strong> 無原文、姓名、count或附件資訊洩漏。</p>
+<h3 id="tests-heading-6">SEC-003 · 複合外鍵（M0）</h3>
+<p><strong>Given：</strong> A conversation與B contact存在。<br />
+<strong>When：</strong> 直接以runtime DB連線插入跨workspace parent id。<br />
+<strong>Then：</strong> DB FK拒絕，不只Controller拒絕。</p>
+<h3 id="tests-heading-7">SEC-004 · Agent不是Supervisor（M0）</h3>
+<p><strong>Given：</strong> Agent可看自己案件與未分派佇列。<br />
+<strong>When：</strong> 查同團隊另一客服已接案件。<br />
+<strong>Then：</strong> 依預設拒絕；主管指定scope可查看。</p>
+<h3 id="tests-heading-8">SEC-005 · 角色不可自我提權（M0）</h3>
+<p><strong>Given：</strong> Operations Admin缺Owner/特定grant。<br />
+<strong>When：</strong> 建立角色並給自己Owner或超出scope權限。<br />
+<strong>Then：</strong> 403並audit，未改資料。</p>
+<h3 id="tests-heading-9">SEC-006 · 長駐context不殘留（M0）</h3>
+<p><strong>Given：</strong> 同一Octane worker依序或交錯服務A/B workspace。<br />
+<strong>When：</strong> 使用不同AI credentials、locale與Policy scope。<br />
+<strong>Then：</strong> 不共用或殘留另一workspace的key/context。</p>
+<h3 id="tests-heading-10">SEC-007 · 內部備註永不外洩（M1）</h3>
+<p><strong>Given：</strong> 客服新增internal note。<br />
+<strong>When：</strong> 前台GET/WS/events/export webhook讀取同對話。<br />
+<strong>Then：</strong> Public DTO與public channel完全無note或敏感metadata。</p>
+<h3 id="tests-heading-11">SEC-008 · Socket授權（M1）</h3>
+<p><strong>Given：</strong> Visitor知道另一conversation/session channel名稱。<br />
+<strong>When：</strong> 呼叫broadcast auth或重用錯session資訊。<br />
+<strong>Then：</strong> 拒絕；無資料推送。</p>
+<h3 id="tests-heading-12">SEC-009 · 撤銷既有socket（M1）</h3>
+<p><strong>Given：</strong> 使用者已有訂閱且client不配合logout。<br />
+<strong>When：</strong> 後端停用staff/visitor或取消權限。<br />
+<strong>Then：</strong> 60秒內不再收到新事件，不能靠只驗證subscribe。</p>
+<h3 id="tests-heading-13">SEC-010 · CSRF（M1）</h3>
+<p><strong>Given：</strong> Staff已有cookie。<br />
+<strong>When：</strong> 跨來源表單/缺CSRF發送管理寫入。<br />
+<strong>Then：</strong> 拒絕，合法同站CSRF流程可用。</p>
+<h3 id="tests-heading-14">SEC-011 · Secret不可讀（M3）</h3>
+<p><strong>Given：</strong> 設定provider key與webhook secret。<br />
+<strong>When：</strong> 讀取API/HTML/日誌/錯誤/匯出/稽核。<br />
+<strong>Then：</strong> 不含明文secret，僅masked/present。</p>
+<h3 id="tests-heading-15">SEC-012 · SSRＦ全面覆蓋（M3）</h3>
+<p><strong>Given：</strong> 可配置provider URL、webhook、知識URL、附件URL。<br />
+<strong>When：</strong> 輸入localhost/RFC1918/metadata/IPv6/redirect/DNS rebinding案例。<br />
+<strong>Then：</strong> 預設擋下；明確platform-approved host/port例外受控。</p>
+<h2 id="tests-heading-16">身分與SDK</h2>
+<h3 id="tests-heading-17">ID-001 · 偽造會員ID（M1）</h3>
+<p><strong>Given：</strong> 未登入visitor。<br />
+<strong>When：</strong> 只傳user_id/email或修改JWT claims。<br />
+<strong>Then：</strong> 無法取得已驗證會員與其歷史。</p>
+<h3 id="tests-heading-18">ID-002 · JWT完整驗證（M1）</h3>
+<p><strong>Given：</strong> 合法issuer與簽章測試key。<br />
+<strong>When：</strong> 測wrong alg/aud/iss/brand/inbox/expired/future iat/kid。<br />
+<strong>Then：</strong> 全部拒絕；合法token可交換。</p>
+<h3 id="tests-heading-19">ID-003 · 一次性JWT併發（M1）</h3>
+<p><strong>Given：</strong> 同一jti存在兩個同時交換請求。<br />
+<strong>When：</strong> 使用barrier同步送出。<br />
+<strong>Then：</strong> 最多一次消耗；合法相同冪等重試回同session，不產生兩個會員session。</p>
+<h3 id="tests-heading-20">ID-004 · Refresh rotation/reuse（M1）</h3>
+<p><strong>Given：</strong> 合法visitor refresh token。<br />
+<strong>When：</strong> 旋轉後再次使用舊token。<br />
+<strong>Then：</strong> 偵測reuse並撤銷該family，不接受已失效token。</p>
+<h3 id="tests-heading-21">ID-005 · 宿主logout（M1）</h3>
+<p><strong>Given：</strong> 會員A有草稿與socket。<br />
+<strong>When：</strong> 宿主logout後同瀏覽器登入B。<br />
+<strong>Then：</strong> B看不到A歷史/未讀/草稿，舊session不再收資料。</p>
+<h3 id="tests-heading-22">ID-006 · 匿名合併（M1）</h3>
+<p><strong>Given：</strong> 匿名曾交談，之後登入會員。<br />
+<strong>When：</strong> 執行identify。<br />
+<strong>Then：</strong> 預設不自動合併；顯式合併需兩方持有權與audit。</p>
+<h3 id="tests-heading-23">ID-007 · postMessage隔離（M1）</h3>
+<p><strong>Given：</strong> widget已handshake。<br />
+<strong>When：</strong> 錯origin/source/nonce發message。<br />
+<strong>Then：</strong> 忽略，不執行命令；正確origin可用。</p>
+<h3 id="tests-heading-24">ID-008 · SPA重複初始化（M1）</h3>
+<p><strong>Given：</strong> 網站多次切頁/呼叫init。<br />
+<strong>When：</strong> 重複init/open/destroy再init。<br />
+<strong>Then：</strong> 不多生iframe/socket/事件listener；destroy不冒充logout。</p>
+<h3 id="tests-heading-25">ID-009 · 第三方cookie封鎖（M1）</h3>
+<p><strong>Given：</strong> 瀏覽器封鎖第三方cookie。<br />
+<strong>When：</strong> 匿名/會員bootstrap、發訊息、重整。<br />
+<strong>Then：</strong> 受限token機制可用；無法persist匿名時顯示合理狀態。</p>
+<h3 id="tests-heading-26">ID-010 · 前端自訂欄位提權（M1）</h3>
+<p><strong>Given：</strong> attributes有visitor-editable設定。<br />
+<strong>When：</strong> 傳VIP、balance、verified=true或別人contact_id。<br />
+<strong>Then：</strong> 拒絕或忽略並依契約回錯，不成為可信業務事實。</p>
+<h2 id="tests-heading-27">訊息與狀態</h2>
+<h3 id="tests-heading-28">MSG-001 · 訊息重送（M1）</h3>
+<p><strong>Given：</strong> 一次POST已commit但response遺失。<br />
+<strong>When：</strong> 相同client_message_id/key/body重送10次。<br />
+<strong>Then：</strong> 只一筆message，回原ID與seq，UI只一份。</p>
+<h3 id="tests-heading-29">MSG-002 · 同key不同body（M1）</h3>
+<p><strong>Given：</strong> 既有idempotency record。<br />
+<strong>When：</strong> 同key換文字/附件再送。<br />
+<strong>Then：</strong> 409，不污染既有內容。</p>
+<h3 id="tests-heading-30">MSG-003 · HTTP冪等到期（M1）</h3>
+<p><strong>Given：</strong> message已存在，HTTP response cache清除。<br />
+<strong>When：</strong> 重送原source/client_message_id。<br />
+<strong>Then：</strong> 長期unique仍抑制重複。</p>
+<h3 id="tests-heading-31">MSG-004 · 真正順序（M1）</h3>
+<p><strong>Given：</strong> 兩條獨立PG連線並發寫同對話。<br />
+<strong>When：</strong> 用barrier控制commit/競爭。<br />
+<strong>Then：</strong> message_seq單調唯一，不依UUID/created_at推序。</p>
+<h3 id="tests-heading-32">MSG-005 · 雙客服接單（M1）</h3>
+<p><strong>Given：</strong> 一個human_queue案件。<br />
+<strong>When：</strong> 兩客服同時claim同version。<br />
+<strong>Then：</strong> 一個成功，一個409；唯一assignee與一次容量占用。</p>
+<h3 id="tests-heading-33">MSG-006 · 容量競爭（M1）</h3>
+<p><strong>Given：</strong> 某客服只剩一格容量。<br />
+<strong>When：</strong> 兩個案件同時自動分派給他。<br />
+<strong>Then：</strong> 最多一件成功，另一留queue或分別人。</p>
+<h3 id="tests-heading-34">MSG-007 · 無人在線（M1）</h3>
+<p><strong>Given：</strong> 沒有eligible available agent。<br />
+<strong>When：</strong> 會員要求人工。<br />
+<strong>Then：</strong> human_queue/離線文案，不假裝已接通，不丟訊息。</p>
+<h3 id="tests-heading-35">MSG-008 · 過期人工操作（M1）</h3>
+<p><strong>Given：</strong> 客服草稿仍在舊version。<br />
+<strong>When：</strong> 另一人先轉派，原人再公開送出。<br />
+<strong>Then：</strong> 409並保存草稿，不越權回覆。</p>
+<h3 id="tests-heading-36">MSG-009 · 等待會員與結案（M1）</h3>
+<p><strong>Given：</strong> 人工回覆並waiting_customer後接到新會員訊息。<br />
+<strong>When：</strong> 回覆→結案→72小時內新訊息。<br />
+<strong>Then：</strong> 正確open/human→resolved→human_queue重開，報表周期不混淆。</p>
+<h3 id="tests-heading-37">MSG-010 · 過重開視窗（M1）</h3>
+<p><strong>Given：</strong> 已結案超過72小時。<br />
+<strong>When：</strong> 往舊conversation POST會員訊息。<br />
+<strong>Then：</strong> 409 NEW_CONVERSATION_REQUIRED；SDK新建related會話，原draft不丟失。</p>
+<h3 id="tests-heading-38">MSG-011 · Snooze容量（M1）</h3>
+<p><strong>Given：</strong> 人工snoozed，容量已釋出且可能被占滿。<br />
+<strong>When：</strong> wake_at到達。<br />
+<strong>Then：</strong> 重查資格/容量，適當回human或human_queue，不超賣。</p>
+<h3 id="tests-heading-39">MSG-012 · 已讀單調（M1）</h3>
+<p><strong>Given：</strong> last_read_seq已較新。<br />
+<strong>When：</strong> 送舊seq或超過可見最新seq。<br />
+<strong>Then：</strong> 舊seq不倒退，越界422，內部note不洩漏。</p>
+<h3 id="tests-heading-40">MSG-013 · WS缺口/重播（M1）</h3>
+<p><strong>Given：</strong> 前端已套用event41，漏42收到43。<br />
+<strong>When：</strong> 重連補after41，或游標過期。<br />
+<strong>Then：</strong> 正確套用42/43；expired410+一致snapshot，不漏訊息。</p>
+<h3 id="tests-heading-41">MSG-014 · Bigint安全（M1）</h3>
+<p><strong>Given：</strong> seed seq大於2^53。<br />
+<strong>When：</strong> API→SDK→排序/補播。<br />
+<strong>Then：</strong> 全程字串/BigInt安全，沒有精度丟失。</p>
+<h2 id="tests-heading-42">前台與工作台</h2>
+<h3 id="tests-heading-43">UI-001 · 行動版與IME（M1）</h3>
+<p><strong>Given：</strong> 窄螢幕/軟鍵盤/中文IME。<br />
+<strong>When：</strong> 組字Enter、附件、泡泡開關。<br />
+<strong>Then：</strong> 組字不誤送，輸入框可見，close focus回原元素。</p>
+<h3 id="tests-heading-44">UI-002 · 無障礙（M1）</h3>
+<p><strong>Given：</strong> 只用鍵盤/螢幕閱讀器/放大200%。<br />
+<strong>When：</strong> 開泡泡、切對話、發訊息、轉人工。<br />
+<strong>Then：</strong> 主要流程可完成，狀態非純色，live通知不洗版。</p>
+<h3 id="tests-heading-45">UI-003 · 斷線待送（M1）</h3>
+<p><strong>Given：</strong> 發訊息時斷網。<br />
+<strong>When：</strong> 恢復連線後重試。<br />
+<strong>Then：</strong> 保留draft與原client id，無假成功/重複。</p>
+<h3 id="tests-heading-46">UI-004 · 多分頁通知（M1）</h3>
+<p><strong>Given：</strong> 同staff開三個分頁。<br />
+<strong>When：</strong> 收到同一事件。<br />
+<strong>Then：</strong> 每頁列表正確，通知/聲音合理去重。</p>
+<h2 id="tests-heading-47">檔案</h2>
+<h3 id="tests-heading-48">FILE-001 · 上傳偽裝（M1）</h3>
+<p><strong>Given：</strong> 檔名jpg但magic為HTML/執行檔。<br />
+<strong>When：</strong> 上傳與complete。<br />
+<strong>Then：</strong> 拒絕，不以客戶端Content-Type信任。</p>
+<h3 id="tests-heading-49">FILE-002 · 掃描未完成/故障（M1）</h3>
+<p><strong>Given：</strong> 檔案在quarantined。<br />
+<strong>When：</strong> 附到訊息/給AI讀取/下載。<br />
+<strong>Then：</strong> 禁止；掃描故障不fail open，文字聊天可用。</p>
+<h3 id="tests-heading-50">FILE-003 · 下載權限（M1）</h3>
+<p><strong>Given：</strong> 另一brand/visitor知道file id。<br />
+<strong>When：</strong> 取signed URL或改message附件id。<br />
+<strong>Then：</strong> 拒絕；已刪/撤銷後不發新URL。</p>
+<h3 id="tests-heading-51">FILE-004 · PDF限制（M2）</h3>
+<p><strong>Given：</strong> 掃描PDF、巨型PDF、損壞文件。<br />
+<strong>When：</strong> 知識匯入。<br />
+<strong>Then：</strong> 可理解OCR_REQUIRED/too_large/parse_failed，不假裝已索引。</p>
+<h2 id="tests-heading-52">AI接待</h2>
+<h3 id="tests-heading-53">AI-001 · 模型可完全關閉（M2）</h3>
+<p><strong>Given：</strong> 未提供任何provider key。<br />
+<strong>When：</strong> 跑純人工M1流程。<br />
+<strong>Then：</strong> 可用且不嘗試外部AI請求。</p>
+<h3 id="tests-heading-54">AI-002 · 人工先提交（M2）</h3>
+<p><strong>Given：</strong> AI fake provider阻塞到指定barrier。<br />
+<strong>When：</strong> human claim/handoff先commit，再釋放AI。<br />
+<strong>Then：</strong> 無新AI公開message；run stale/cancelled。</p>
+<h3 id="tests-heading-55">AI-003 · AI先提交（M2）</h3>
+<p><strong>Given：</strong> AI已原子publish。<br />
+<strong>When：</strong> 人工接手。<br />
+<strong>Then：</strong> 該答案作已發布歷史，之後不再自動回答，不聲稱可收回已送token。</p>
+<h3 id="tests-heading-56">AI-004 · 新問題廢止舊答案（M2）</h3>
+<p><strong>Given：</strong> AI針對訊息A生成中。<br />
+<strong>When：</strong> 會員送B後AI完成A。<br />
+<strong>Then：</strong> A的舊run不發布，新epoch可針對新語境處理。</p>
+<h3 id="tests-heading-57">AI-005 · Queue重跑final（M2）</h3>
+<p><strong>Given：</strong> AI已publish，task重投/worker crash重試。<br />
+<strong>When：</strong> 重新執行相同run。<br />
+<strong>Then：</strong> unique+狀態檢查，最多一筆final message。</p>
+<h3 id="tests-heading-58">AI-006 · Worker卡住（M2）</h3>
+<p><strong>Given：</strong> AI worker永不返回或被kill。<br />
+<strong>When：</strong> deadline已到，watchdog獨立執行。<br />
+<strong>Then：</strong> 10秒掃描周期後轉human_queue，舊lease不可再publish。</p>
+<h3 id="tests-heading-59">AI-007 · Assist不是autopilot（M2）</h3>
+<p><strong>Given：</strong> human接待案件。<br />
+<strong>When：</strong> 客服生成AI draft。<br />
+<strong>Then：</strong> 草稿僅staff可讀，不自動送客戶。</p>
+<h3 id="tests-heading-60">AI-008 · 原生協定（M2）</h3>
+<p><strong>Given：</strong> 四種protocol有正常/錯誤fixture。<br />
+<strong>When：</strong> 執行adapter contract suite。<br />
+<strong>Then：</strong> DTO一致，Anthropic/Gemini不硬套OpenAI格式。</p>
+<h3 id="tests-heading-61">AI-009 · 能力不支援（M2）</h3>
+<p><strong>Given：</strong> model capabilities無tools/json/embedding。<br />
+<strong>When：</strong> 要求該功能。<br />
+<strong>Then：</strong> CAPABILITY_UNSUPPORTED，非空成功或靜默忽略。</p>
+<h3 id="tests-heading-62">AI-010 · 截斷/拒答（M2）</h3>
+<p><strong>Given：</strong> 上游返回refusal/empty/max_tokens或stream中斷。<br />
+<strong>When：</strong> 生成流程完成。<br />
+<strong>Then：</strong> 不當完整成功，受控重試或交人工。</p>
+<h3 id="tests-heading-63">AI-011 · 重試放大（M2）</h3>
+<p><strong>Given：</strong> SDK/queue可設定retry。<br />
+<strong>When：</strong> 429/500/timeout混合。<br />
+<strong>Then：</strong> 每run不超2次provider嘗試，受90秒總deadline。</p>
+<h3 id="tests-heading-64">AI-012 · Fallback資料政策（M2）</h3>
+<p><strong>Given：</strong> 備援provider未獲workspace同意。<br />
+<strong>When：</strong> 主provider故障。<br />
+<strong>Then：</strong> 不外送資料給備援；交人工或只用已核准fallback。</p>
+<h3 id="tests-heading-65">AI-013 · 成本未知與預算（M2）</h3>
+<p><strong>Given：</strong> usage缺失或多個run同時剩餘預算不足。<br />
+<strong>When：</strong> 生成/預留/結算。<br />
+<strong>Then：</strong> unknown不記0，並發預留不超過設定，人工仍可用。</p>
+<h3 id="tests-heading-66">AI-014 · 停用即生效（M2）</h3>
+<p><strong>Given：</strong> AI尚生成中。<br />
+<strong>When：</strong> 管理員kill switch或關鍵profile變動。<br />
+<strong>Then：</strong> 新run不啟動，舊run發布前失效。</p>
+<h3 id="tests-heading-67">AI-015 · Prompt injection（M2）</h3>
+<p><strong>Given：</strong> 會員/文件/工具結果含跳過規則與索取secret指令。<br />
+<strong>When：</strong> 檢索並生成。<br />
+<strong>Then：</strong> 不超scope、不執行任意工具，不回secret。</p>
+<h3 id="tests-heading-68">AI-016 · 工具查本人資料（M2）</h3>
+<p><strong>Given：</strong> 已驗證會員A、存在B订单。<br />
+<strong>When：</strong> 模型工具參數嘗試user_id=B或order屬B。<br />
+<strong>Then：</strong> 後端ownership拒絕，ActorContext不由模型覆寫。</p>
+<h2 id="tests-heading-69">知識與檢索</h2>
+<h3 id="tests-heading-70">RAG-001 · Staff-only隔離（M2）</h3>
+<p><strong>Given：</strong> 公開與staff_only文件內容近似。<br />
+<strong>When：</strong> 外部auto retrieval/answer。<br />
+<strong>Then：</strong> 排除staff_only，包括引用/日志/候選內容。</p>
+<h3 id="tests-heading-71">RAG-002 · 草稿不生效（M2）</h3>
+<p><strong>Given：</strong> 舊published版與新draft/indexing版。<br />
+<strong>When：</strong> 外部提問。<br />
+<strong>Then：</strong> 只用舊核准發布版。</p>
+<h3 id="tests-heading-72">RAG-003 · 發布原子性（M2）</h3>
+<p><strong>Given：</strong> 新version部分chunks失敗。<br />
+<strong>When：</strong> 嘗試publish。<br />
+<strong>Then：</strong> 拒絕；舊版仍可用，沒有半新半舊。</p>
+<h3 id="tests-heading-73">RAG-004 · 撤下中生成（M2）</h3>
+<p><strong>Given：</strong> AI檢索了將撤下文件。<br />
+<strong>When：</strong> 先unpublish再讓AI返回。<br />
+<strong>Then：</strong> generation不符，重新檢索/交人工，舊答案不發布。</p>
+<h3 id="tests-heading-74">RAG-005 · 換Embedding（M2）</h3>
+<p><strong>Given：</strong> 不同模型即使同維度。<br />
+<strong>When：</strong> 切換model/profile。<br />
+<strong>Then：</strong> 全量新profile重建；不能混用舊向量。</p>
+<h3 id="tests-heading-75">RAG-006 · 維度與異常vector（M2）</h3>
+<p><strong>Given：</strong> embedding回錯維度/NaN/空向量或3072維。<br />
+<strong>When：</strong> 建立/查詢索引。<br />
+<strong>Then：</strong> 拒絕invalid；不建立不相容的vector HNSW；合法halfvec策略另評測。</p>
+<h3 id="tests-heading-76">RAG-007 · 中文與精確碼（M2）</h3>
+<p><strong>Given：</strong> 題庫含繁簡體/別名/ERR-1048/型號。<br />
+<strong>When：</strong> 比較vector/lexical/hybrid。<br />
+<strong>Then：</strong> 可重現記錄召回與答案，未支持的斷詞不冒稱成熟。</p>
+<h3 id="tests-heading-77">RAG-008 · 無答案與偽引用（M2）</h3>
+<p><strong>Given：</strong> 沒有核准來源或模型輸出S99/任意URL。<br />
+<strong>When：</strong> 結果validation。<br />
+<strong>Then：</strong> 不給假引用/確定答案，轉人工或一次澄清。</p>
+<h3 id="tests-heading-78">RAG-009 · ANN過濾候選不足（M2）</h3>
+<p><strong>Given：</strong> 多workspace資料且某inbox來源稀少。<br />
+<strong>When：</strong> 設定topK檢索。<br />
+<strong>Then：</strong> 不洩漏其他租戶；必要時增加scan/精確fallback並紀錄。</p>
+<h2 id="tests-heading-79">串接</h2>
+<h3 id="tests-heading-80">INT-001 · Webhook原始body簽章（M3）</h3>
+<p><strong>Given：</strong> 合法HMAC payload。<br />
+<strong>When：</strong> 變空白/改body、錯timestamp/key id/signature。<br />
+<strong>Then：</strong> 修改後拒絕；原始payload才接受。</p>
+<h3 id="tests-heading-81">INT-002 · Inbound重送/亂序（M3）</h3>
+<p><strong>Given：</strong> 相同external event/message與交錯timestamp。<br />
+<strong>When：</strong> 重送10次與亂序發送。<br />
+<strong>Then：</strong> 原始message唯一，保存received/occurred時間，不無故倒退狀態。</p>
+<h3 id="tests-heading-82">INT-003 · 持久化後才ACK（M3）</h3>
+<p><strong>Given：</strong> DB不可用或commit前process crash。<br />
+<strong>When：</strong> sender發webhook。<br />
+<strong>Then：</strong> 非2xx/連線失敗讓上游重送；不回假accepted。</p>
+<h3 id="tests-heading-83">INT-004 · 外部送出未知（M3）</h3>
+<p><strong>Given：</strong> 第三方已收到但HTTP response遺失。<br />
+<strong>When：</strong> client timeout。<br />
+<strong>Then：</strong> delivery_unknown；無外部冪等不得盲重送。</p>
+<h3 id="tests-heading-84">INT-005 · Outbound重送（M3）</h3>
+<p><strong>Given：</strong> receiver第一次500後200。<br />
+<strong>When：</strong> 排程retry/手動retry。<br />
+<strong>Then：</strong> event_id固定，新timestamp/signature，無secret洩漏與audit完整。</p>
+<h3 id="tests-heading-85">INT-006 · 機器token scope（M3）</h3>
+<p><strong>Given：</strong> api client只許某inbox寫入會員訊息。<br />
+<strong>When：</strong> 改brand/inbox或冒充staff。<br />
+<strong>Then：</strong> 拒絕；token只能執行授權動作。</p>
+<h2 id="tests-heading-86">部署與恢復</h2>
+<h3 id="tests-heading-87">OPS-001 · Redis失效（M3）</h3>
+<p><strong>Given：</strong> 已收到會員訊息但queue enqueue失敗。<br />
+<strong>When：</strong> 關Redis後持續HTTP人工操作，再恢復Redis。<br />
+<strong>Then：</strong> DB保留訊息/任務，dispatcher可恢復，不丟失/重複final。</p>
+<h3 id="tests-heading-88">OPS-002 · Outbox crash window（M3）</h3>
+<p><strong>Given：</strong> message+event commit後尚未發送或發送後尚未ACK。<br />
+<strong>When：</strong> kill dispatcher後重啟。<br />
+<strong>Then：</strong> 至少一次event，consumer去重；不把event永久卡死。</p>
+<h3 id="tests-heading-89">OPS-003 · 過期lease fencing（M3）</h3>
+<p><strong>Given：</strong> worker A lease過期、B重新claim。<br />
+<strong>When：</strong> A晚回並想標完成/發布。<br />
+<strong>Then：</strong> A不能覆蓋B ownership/結果。</p>
+<h3 id="tests-heading-90">OPS-004 · Queue資源隔離（M3）</h3>
+<p><strong>Given：</strong> 大量KB import與AI生成。<br />
+<strong>When：</strong> 同時人工發訊息/claim/watchdog。<br />
+<strong>Then：</strong> core仍可服務；Redis payload只有IDs、不帶完整文件。</p>
+<h3 id="tests-heading-91">OPS-005 · Timeout關係（M3）</h3>
+<p><strong>Given：</strong> 配置core/ai/kb不同工作。<br />
+<strong>When：</strong> 驗證job&lt;supervisor&lt;retry_after且總deadline。<br />
+<strong>Then：</strong> 配置測試拒絕不合理值；無tries=0。</p>
+<h3 id="tests-heading-92">OPS-006 · 完整還原（M3）</h3>
+<p><strong>Given：</strong> 真實備份含DB/附件/secret key metadata及erasure tombstone。<br />
+<strong>When：</strong> 還原至隔離環境。<br />
+<strong>Then：</strong> 可登入/看授權歷史/搜尋/下載；刪除tombstone重播；記錄RPO/RTO。</p>
+<h3 id="tests-heading-93">OPS-007 · 滾動部署（M3）</h3>
+<p><strong>Given：</strong> 有running AI與連線訪客。<br />
+<strong>When：</strong> expand migration/worker重啟/回滾應用。<br />
+<strong>Then：</strong> 舊新版本相容；不執行破壞性fresh migration。</p>
+<h3 id="tests-heading-94">OPS-008 · 壓測與隔離（M3）</h3>
+<p><strong>Given：</strong> SPEC參考資料量/硬體/fake模型。<br />
+<strong>When：</strong> 穩態30分鐘+2倍突發5分鐘。<br />
+<strong>Then：</strong> 附p95/錯誤/資源圖與不變量結果，無實測不能標通過。</p>
+<h3 id="tests-heading-95">OPS-009 · 匯出與刪除（M3）</h3>
+<p><strong>Given：</strong> staff先申請匯出後被撤權；客戶有刪除要求。<br />
+<strong>When：</strong> 下載匯出/執行erasure/還原backup。<br />
+<strong>Then：</strong> 下載重查權限；DB/文件/向量/cache一起清理；不得備份還原復活資料。</p>
+<h3 id="tests-heading-96">OPS-010 · 授權與供應鏈（M3）</h3>
+<p><strong>Given：</strong> 存在Composer/NPM/容器依賴。<br />
+<strong>When：</strong> 執行SBOM/license/audit與lockfile檢查。<br />
+<strong>Then：</strong> 提交實際版本與結果；未掃描者不得標零風險。</p>
+<h2 id="tests-heading-97">各階段證據清单</h2>
+<p>每個milestone須提供實際test report、API contract diff、尚未實測的provider/channel名單與已知限制。一次完整AI答案展示、畫面截圖或AI自行表示「已完成」，均不足以代替上述測試。</p>
+</section><section class="document" id="doc-plan"><div class="eyebrow">IMPLEMENTATION_PLAN.md</div><h1 id="plan-heading-1">分階段實作計畫與交付檢查</h1>
+<p>本計畫不預估工期。每個階段以可執行、可驗收的成果為準，不以產生多少行程式或畫面數量為準。</p>
+<h2 id="plan-heading-2">M0｜可測試的安全基礎</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+  <th>Task</th>
+  <th>交付與判定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>M0-01</td>
+  <td>建立repo與dependency matrix：PHP8.4/Laravel13實際patch、SDK、Vue/TS/Vite、PG/vector、Redis、license與lockfile；先跑最小安裝/測試</td>
+</tr>
+<tr>
+  <td>M0-02</td>
+  <td>Docker dev/test，app/PG/vector/Redis queue/cache/Reverb/worker分服務；.env只示例不帶secret；health checks</td>
+</tr>
+<tr>
+  <td>M0-03</td>
+  <td>workspace/brand/inbox/users/membership/role資料表及composite FK；2 workspace ×2 brand測試seed</td>
+</tr>
+<tr>
+  <td>M0-04</td>
+  <td>Staff session、邀請/密碼重設/MFA與Policies；補齊相關OpenAPI；Owner/Admin/Supervisor/Agent/KB角色</td>
+</tr>
+<tr>
+  <td>M0-05</td>
+  <td>Request context/ActorContext、顯式DTO、錯誤格式、idempotency、request/trace id、secret handling</td>
+</tr>
+<tr>
+  <td>M0-06</td>
+  <td>CI：unit/integration/static/typecheck/contract/lint；真實PG並發測試工具與provider fake server</td>
+</tr>
+<tr>
+  <td>M0-07</td>
+  <td>通過SEC-001～006；記錄尚未啟用的production控制，無條件繼續前先補資料隔離問題</td>
+</tr>
+</tbody>
+</table></div>
+<p>不引入多租戶註冊/計費；可用CLI建立第一位Owner。Demo帳密只在local seed生成並標示，正式seed不能固定密碼。</p>
+<h2 id="plan-heading-3">M1｜完整純人工客服</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+  <th>Task</th>
+  <th>交付與判定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>M1-01</td>
+  <td>contacts/identities/visitor session、JWT交換、refresh rotation/revocation；完成ID-001～006</td>
+</tr>
+<tr>
+  <td>M1-02</td>
+  <td>conversation/message/state machine、row locks、version/epoch、source uniqueness與read markers</td>
+</tr>
+<tr>
+  <td>M1-03</td>
+  <td>assignment/capacity、available/heartbeat、等待會員、結案/重開/snooze/轉派；MSG-005～012</td>
+</tr>
+<tr>
+  <td>M1-04</td>
+  <td>async_tasks、outbox、audience-specific realtime events；先接fake publisher再Reverb；MSG-001～004/013～014</td>
+</tr>
+<tr>
+  <td>M1-05</td>
+  <td>Widget獨立Vue/TS build、loader/iframe、泡泡/embedded/hosted、SDK d.ts方法與events、first-party demo host</td>
+</tr>
+<tr>
+  <td>M1-06</td>
+  <td>客服工作台：列表/搜尋/對話/內部備註/客戶sidebar/快捷回覆/附件/結案；草稿不因409遺失</td>
+</tr>
+<tr>
+  <td>M1-07</td>
+  <td>運營基礎：brands/inboxes/origins/staff/team/roles、營業時間/假日、巨集/標籤；每個細項先補OpenAPI</td>
+</tr>
+<tr>
+  <td>M1-08</td>
+  <td>檔案上傳quarantine/scan/download、權限與上傳配額；FILE-001～003</td>
+</tr>
+<tr>
+  <td>M1-09</td>
+  <td>Reverb auth、session fanout、撤權、重連/補播/snapshot/fallback polling；SEC-007～010、ID-007～010</td>
+</tr>
+<tr>
+  <td>M1-10</td>
+  <td>M1所有測試 + UI-001～004通過；展示匿名→會員、要求人工、接單回覆→結案→重開完整流程</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>M1閘門：任何AI key不存在時仍可完整使用人工客服。</strong> 基本知識/FAQ可先展示核准固定資料，不用假的AI回答冒充M2。</p>
+<h2 id="plan-heading-4">M2｜可替換AI + 自建RAG</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+  <th>Task</th>
+  <th>交付與判定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>M2-01</td>
+  <td>provider connections/model capability/ChatGateway/EmbeddingGateway/RerankGateway；LaravelAiAdapter第一個實作</td>
+</tr>
+<tr>
+  <td>M2-02</td>
+  <td>四協定fixtures及error/stream/usage/unsupported測試；至少一個real Chat與Embedding live驗證，其他明確標未實測</td>
+</tr>
+<tr>
+  <td>M2-03</td>
+  <td>知識資料表、FAQ/Markdown/TXT/PDF parser interface、病毒掃描整合、immutable draft/index/publish、來源scope</td>
+</tr>
+<tr>
+  <td>M2-04</td>
+  <td>Embedding profile版本、維度檢查、新舊索引並存、atomic activation；小資料精確搜尋，ANN按壓測引入</td>
+</tr>
+<tr>
+  <td>M2-05</td>
+  <td>中文FAQ aliases/lexical/vector融合、候選授權、source引用、staff測試提問頁</td>
+</tr>
+<tr>
+  <td>M2-06</td>
+  <td>AutopilotRun狀態、debounce、期限、epoch/lease/generation final commit、handoff、獨立watchdog</td>
+</tr>
+<tr>
+  <td>M2-07</td>
+  <td>assist_only草稿/摘要、AI kill switch、原生能力probe、預算預留/usage、allowlisted fallback</td>
+</tr>
+<tr>
+  <td>M2-08</td>
+  <td>ToolBroker readonly示例：本地fake「查本人案件」，ownership enforced；不接真帳務寫入</td>
+</tr>
+<tr>
+  <td>M2-09</td>
+  <td>運營知識編輯/審核/發布/撤下/版本比較、AI設定/品質頁與150題評測資料格式</td>
+</tr>
+<tr>
+  <td>M2-10</td>
+  <td>AI-001～016、RAG-001～009、FILE-004；輸出模型/檢索評測與已知無答案情境</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>M2閘門：人類先接手提交後，任何晚回AI答案都無法公開發布；知識撤下與換Embedding無混用。</strong></p>
+<h2 id="plan-heading-5">M3｜通用串接與生產驗收</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+  <th>Task</th>
+  <th>交付與判定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>M3-01</td>
+  <td>Scoped API clients、contact upsert、generic channel inbound/outbound、HMAC簽章/重試/delivery_unknown</td>
+</tr>
+<tr>
+  <td>M3-02</td>
+  <td>通用ChannelAdapter與capabilities，不綁特定社群；connector管理、健康、歷史與手動重送</td>
+</tr>
+<tr>
+  <td>M3-03</td>
+  <td>報表/CSAT/AI用量/匯出、audit、保留/刪除/erasure tombstones、權限重查</td>
+</tr>
+<tr>
+  <td>M3-04</td>
+  <td>Redis隔離/noeviction、Horizon資源、durable task recovery、outbox/watchdog/lease故障測試</td>
+</tr>
+<tr>
+  <td>M3-05</td>
+  <td>反代/TLS/CSP/安全headers、MFA rollout、SSRF egress、依賴掃描與secret檢查</td>
+</tr>
+<tr>
+  <td>M3-06</td>
+  <td>備份/PITR/附件還原、移轉/升級/回滾腳本、關鍵事故runbook；實測RPO/RTO</td>
+</tr>
+<tr>
+  <td>M3-07</td>
+  <td>參考資料量與負載的穩態/突發壓測，整理p95與資源瓶頸、正確性不變量</td>
+</tr>
+<tr>
+  <td>M3-08</td>
+  <td>補齊全量OpenAPI/生成TS client、SDK範例與宿主身分簽發說明；INT/OPS/SEC餘下blocking測試</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>M3閘門：85條設計驗收案例都有實際測試/證據對應；不能只有清單勾選。</strong> 不達效能目標可先限制試營運容量，但必須明示限額，不能把未達標結果改名達標。</p>
+<h2 id="plan-heading-6">P2 / P3｜按需要擴展</h2>
+<p>先選實際使用最多的一個外部渠道，推薦的規格展開順序是LINE、Telegram、Email（這是本案優先級，不代表產品能力排名）。每個connector有官方規則查核、授權、能力矩陣、fixtures、實際帳號端到端測試、故障/亂序/附件/重送驗收後才開feature flag。</p>
+<p>之後才做WhatsApp/Messenger/Instagram、SSO、CRM現成connector、MCP、原生push、OCR、進階SLA/排班、多租戶商業化。新增渠道不得改壞既有消息/角色/AI域模型。</p>
+<h2 id="plan-heading-7">建議repo結構（待實作）</h2>
+<pre><code class="language-text">app/
+  Modules/
+    Identity/ AccessControl/ Workspaces/ Contacts/
+    Conversations/ Assignment/ Messages/ Knowledge/
+    Ai/{Contracts,DTOs,Adapters,Actions,Policies}/
+    Channels/{Contracts,Adapters,DTOs}/
+    Integrations/ Files/ Audit/ Reporting/ Operations/
+resources/
+  staff-app/             # Vue/TS: /ops and /agent
+  widget-app/            # isolated build
+packages/
+  widget-sdk/            # loader + public methods + declaration tests
+database/{migrations,factories,seeders}/
+tests/{Unit,Feature,Integration,Concurrency,Contract}/
+e2e/                     # Playwright demo host + staff + visitor
+docs/                    # this package + ADR + runbooks
+infra/                   # dev/prod templates, no real secrets
+</code></pre>
+<p>此目錄是建議，不要求為每個資料表增加空interface。可依Laravel慣例調整，但對外contract與安全邊界不改。</p>
+<h2 id="plan-heading-8">正式交付檔案</h2>
+<p>應用程式、lockfiles、migrations、factory/seed、測試、完整OpenAPI、SDK build、部署/升級/回滾/備份/還原手冊、ENV參數說明、provider/channel實測矩陣、RAG評測集/結果、效能測試結果、SBOM/授權及已知限制。</p>
+</section><section class="document" id="doc-agents"><div class="eyebrow">AGENTS.md</div><h1 id="agents-heading-1">本地 AI 開發代理工作規則</h1>
+<p>此資料夾是<strong>規格文件包</strong>，不是既有應用。專案暫名SupportDesk；實作語言PHP/TypeScript，核心技術固定Laravel、PostgreSQL/pgvector、Redis/Horizon、Reverb。</p>
+<h2 id="agents-heading-2">必讀與工作順序</h2>
+<ol>
+<li>讀SPEC、DATA_MODEL、AI_ADAPTERS、API_CONTRACT、OpenAPI、ACCEPTANCE_TESTS與IMPLEMENTATION_PLAN。</li>
+<li>若目標目錄已有repo，先檢查現狀與未提交變更，不能覆寫使用者工作。把文件放docs，保留git歷史。</li>
+<li>先完成M0，再M1人工閉環，再M2 AI，再M3生產化；不要先做LINE/WhatsApp、漂亮展示或多Agent平台。</li>
+<li>小步實作，每個task包含migration/Policy/DTO/測試/文件，不做幾千行巨型Controller。</li>
+<li>一個里程碑完成後，輸出已完成ID、實際執行命令與結果、已知限制、下一個可執行task。未執行不寫「測試通過」。</li>
+</ol>
+<h2 id="agents-heading-3">不能變更的設計</h2>
+<ul>
+<li>workspace/brand/inbox/visitor資料隔離；scope不可由client/model自行擴大。</li>
+<li>staff public reply、internal note、visitor public DTO完全分開。</li>
+<li>DB是訊息/任務/事件權威來源；Reverb/Redis不是唯一聊天紀錄。</li>
+<li>message source/client唯一鍵、outbox、task lease fencing、人機交接atomic final commit必須實作。</li>
+<li>AI off時純人工可工作；assist草稿不自動公開；模型/工具不得直接修改conversation state。</li>
+<li>provider protocol與model capability、Chat/Embedding/Rerank解耦；同維度不同Embedding也不混索引。</li>
+<li>知識先審核發布；外部AI不能檢索staff_only或其他品牌內容。</li>
+<li>秘鑰不進前端、URL、log或public API；不自製JWT/HMAC演算法（可使用標準庫計算HMAC與維護中的JWT庫）。</li>
+</ul>
+<h2 id="agents-heading-4">套件/程式要求</h2>
+<p>M0查官方文件、Composer/NPM相容性，提交dependency matrix與lockfile。勿依舊記憶虛構Laravel SDK方法。<code>laravel/ai</code>等vendor API只在adapter使用；interface/DTO名稱以本規格為準，不以某個SDK response綁住整個domain。</p>
+<p>Backend用Pest或PHPUnit、Laravel Pint、PHPStan/Larastan；Frontend用TypeScript strict、Vitest、Playwright。選定具體版本後將完整命令寫入repo README與CI。不能只寫lint就宣稱功能驗收。</p>
+<p>DB必用真實PostgreSQL（含vector extension）的integration test；SQLite只能做非DB純函式測試，不能用於狀態競態/FK/向量驗收。並發test用barrier與多連線，不以sleep亂等。</p>
+<p>所有HTTP操作使用FormRequest、Policy與顯式Resource/DTO。避免動態全域config切換workspace/key；Jobs只帶ID及小型metadata。新enum/參數須更新OpenAPI與前端型別。</p>
+<h2 id="agents-heading-5">實作期可用命令模板</h2>
+<p>以下命令依實際選定套件調整並記錄，<strong>不是已執行結果</strong>：</p>
+<pre><code class="language-bash">composer validate --strict
+composer audit
+php artisan test
+vendor/bin/pint --test
+vendor/bin/phpstan analyse
+npm ci
+npm run typecheck
+npm run test -- --run
+npx playwright test
+npm run build
+</code></pre>
+<p>M0需建立Docker開發環境；測試使用獨立DB與bucket，不碰正式資料。不得把 <code>migrate:fresh</code>、清空Redis、destroy volume、廣泛刪檔放進正式部署腳本。測試環境cleanup必須驗證環境名稱與專用資源。</p>
+<h2 id="agents-heading-6">完成與誠實報告</h2>
+<p>沒有API key、SMTP或LINE帳號時，用fixtures/mock測核心；把live驗證標為blocked/未測，不自動創建付費資源或發送外部訊息。不存在的第三方API不能以TODO/空成功回應冒充完成。</p>
+<p>衝突/缺漏先建立ADR與contract補充，再實作；安全與資料完整性需求不可為了讓demo跑起來而移除。尚未收錄OpenAPI的運營細項CRUD是已知待展開範圍，須在該task實作前加入具體schema。</p>
+<p>需要產品負責人配置的值（實際provider/model/key/來源文件/網域/保存政策）不得自行捏造；開發預設AI disabled，使用示範測試資料。文件包中的example.com/.example域名與UUID均為佔位示例。</p>
+</section><section class="document" id="doc-qa"><div class="eyebrow">DOCUMENT_QA.md</div><h1 id="qa-heading-1">文件包檢查報告</h1>
+<p>日期：2026-09-26；對象是<strong>規格文件與型別/語法示例</strong>，不是Laravel 應用功能。</p>
+<h2 id="qa-heading-2">已實際完成的檢查</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+  <th>項目</th>
+  <th>結果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>OpenAPI YAML可解析，與JSON內容一致</td>
+  <td>通過</td>
+</tr>
+<tr>
+  <td>OpenAPI內部$ref、path參數、security scheme引用</td>
+  <td>通過</td>
+</tr>
+<tr>
+  <td>94條path / 124個操作的operationId唯一性</td>
+  <td>通過</td>
+</tr>
+<tr>
+  <td>106個component schemas的JSON Schema meta-validation</td>
+  <td>通過</td>
+</tr>
+<tr>
+  <td>公開/內部event schemas語法</td>
+  <td>通過</td>
+</tr>
+<tr>
+  <td>public-message-created.json正向驗證</td>
+  <td>通過</td>
+</tr>
+<tr>
+  <td>public event拒絕internal visibility欄位</td>
+  <td>通過</td>
+</tr>
+<tr>
+  <td>event_seq拒絕JSON number，要求十進位字串</td>
+  <td>通過</td>
+</tr>
+<tr>
+  <td>core/ai/knowledge的job &lt; supervisor &lt; retry_after</td>
+  <td>通過</td>
+</tr>
+<tr>
+  <td>85個驗收ID唯一，Markdown/YAML案例ID一致</td>
+  <td>通過</td>
+</tr>
+<tr>
+  <td>主文[Rxx]均有REFERENCES定義</td>
+  <td>通過</td>
+</tr>
+<tr>
+  <td>widget-sdk.d.ts TypeScript strict/noEmit</td>
+  <td>通過</td>
+</tr>
+<tr>
+  <td>identity-issuer.php PHP語法lint</td>
+  <td>通過；未執行JWT簽發或驗證</td>
+</tr>
+</tbody>
+</table></div>
+<p>檢查命令：</p>
+<pre><code class="language-bash">python tools/validate_specs.py
+tsc --noEmit --strict --target ES2022 --lib ES2022,DOM contracts/widget-sdk.d.ts
+php -l examples/identity-issuer.php
+</code></pre>
+<h2 id="qa-heading-3">未完成、不能由上述結果推論的項目</h2>
+<p>未執行完整OpenAPI專用語意validator套件：本環境無法取得缺少的套件，已用內部引用/路由/JSON Schema檢查替代部分檢查；開發CI仍應加入正式OpenAPI validator與route契約測試。</p>
+<p>未建立或執行Laravel應用、真實DB migration、Horizon/Reverb、SDK瀏覽器實作、模型API實機呼叫、第三方渠道端到端、壓測或備份還原。85個Given/When/Then是驗收要求，不是85個已通過測試。</p>
+<p>README中的API數量代表本包定義的核心契約；巨集/標籤、邀請/MFA enrollment、報表明細等管理細項仍要在相應階段補齊OpenAPI，不得跳過SPEC已定義的產品需求。</p>
+</section><section class="document" id="doc-refs"><div class="eyebrow">REFERENCES.md</div><h1 id="refs-heading-1">官方參考資料與查核紀錄</h1>
+<p>查核日期：2026-09-26。這些資料支持框架/協定/SDK狀態；本文件包中的架構、數值、角色、API與驗收流程是專案設計，並非官方產品承諾。套件實際版本與相容性仍須M0鎖定並測試。</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+  <th>ID</th>
+  <th>來源與用途</th>
+  <th>官方網址</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>R01</td>
+  <td>Laravel 13 release notes；PHP支援與版本基線</td>
+  <td><code>https://laravel.com/docs/13.x/releases</code></td>
+</tr>
+<tr>
+  <td>R02</td>
+  <td>Laravel AI SDK；供應商、功能矩陣、自訂base URL/相容provider</td>
+  <td><code>https://laravel.com/docs/13.x/ai-sdk</code></td>
+</tr>
+<tr>
+  <td>R03</td>
+  <td>Laravel Reverb；事件迴圈、連線、部署與scaling</td>
+  <td><code>https://laravel.com/docs/13.x/reverb</code></td>
+</tr>
+<tr>
+  <td>R04</td>
+  <td>Laravel Horizon；Redis queue與Redis Cluster限制</td>
+  <td><code>https://laravel.com/docs/13.x/horizon</code></td>
+</tr>
+<tr>
+  <td>R05</td>
+  <td>Laravel Sanctum；SPA session/cookie與API token區別</td>
+  <td><code>https://laravel.com/docs/13.x/sanctum</code></td>
+</tr>
+<tr>
+  <td>R06</td>
+  <td>pgvector官方repo；精確/ANN檢索、向量維度、索引與過濾</td>
+  <td><code>https://github.com/pgvector/pgvector</code></td>
+</tr>
+<tr>
+  <td>R07</td>
+  <td>PostgreSQL Row Security；owner/BYPASSRLS與policy</td>
+  <td><code>https://www.postgresql.org/docs/current/ddl-rowsecurity.html</code></td>
+</tr>
+<tr>
+  <td>R08</td>
+  <td>Laravel Queue；retry_after/timeout/重試/transaction</td>
+  <td><code>https://laravel.com/docs/13.x/queues</code></td>
+</tr>
+<tr>
+  <td>R09</td>
+  <td>OpenAI官方libraries；PHP列在community libraries</td>
+  <td><code>https://developers.openai.com/api/docs/libraries</code></td>
+</tr>
+<tr>
+  <td>R10</td>
+  <td>Anthropic官方PHP SDK；本次文件仍標beta</td>
+  <td><code>https://platform.claude.com/docs/en/cli-sdks-libraries/sdks/php</code></td>
+</tr>
+<tr>
+  <td>R11</td>
+  <td>Google Gemini官方GenAI libraries；語言與維護清單</td>
+  <td><code>https://ai.google.dev/gemini-api/docs/libraries</code></td>
+</tr>
+<tr>
+  <td>R12</td>
+  <td>MDN postMessage；origin/source/targetOrigin安全</td>
+  <td><code>https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage</code></td>
+</tr>
+<tr>
+  <td>R13</td>
+  <td>LINE接收訊息官方說明；webhookEventId重複與亂序</td>
+  <td><code>https://developers.line.biz/en/docs/messaging-api/receiving-messages/</code></td>
+</tr>
+<tr>
+  <td>R14</td>
+  <td>JWT PHP library維護來源；原firebase/php-jwt頁會導向googleapis repo</td>
+  <td><code>https://github.com/firebase/php-jwt</code></td>
+</tr>
+<tr>
+  <td>R15</td>
+  <td>Telegram Bot API官方reference</td>
+  <td><code>https://core.telegram.org/bots/api</code></td>
+</tr>
+<tr>
+  <td>R16</td>
+  <td>PostgreSQL text search parser說明；中文檢索仍需本案測試</td>
+  <td><code>https://www.postgresql.org/docs/current/textsearch-parsers.html</code></td>
+</tr>
+<tr>
+  <td>R17</td>
+  <td>OWASP SSRF Prevention；allowlist/redirect/網路防護設計依據</td>
+  <td><code>https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html</code></td>
+</tr>
+<tr>
+  <td>R18</td>
+  <td>OpenAI Responses遷移與格式</td>
+  <td><code>https://developers.openai.com/api/docs/guides/migrate-to-responses</code></td>
+</tr>
+<tr>
+  <td>R19</td>
+  <td>Gemini GenerateContent官方API reference</td>
+  <td><code>https://ai.google.dev/api/generate-content</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="refs-heading-2">本次未宣稱已驗證的項目</h2>
+<p>沒有執行任何真實provider或第三方渠道呼叫、壓測、DB migration、Horizon/Reverb實機併發或瀏覽器端SDK；文件中的案例是待實作驗收要求。</p>
+<p>本次未取得可完整讀取的Meta WhatsApp webhook頁內容，因此只列為後續架構需求，不列出具體帳號資格、訊息窗口、審核程序或收費數字；P3實作前應重新查核當時官方文件。</p>
+<p>特定模型名稱/價格/最大context不寫死；由管理員配置後probe與能力驗證。本文不作資料保留法律合規結論，正式政策由資料負責人確認。</p>
+</section></main><a class="backtop" href="#top">回到頂部 ↑</a></body></html>

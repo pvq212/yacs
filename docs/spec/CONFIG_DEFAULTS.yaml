@@ -1,0 +1,117 @@
+spec_version: 1.0.0
+# These are design defaults, not proven production capacity.
+locale: zh-TW
+timezone: Asia/Taipei
+identity:
+  algorithm: HS256
+  assertion_ttl_seconds: 60
+  clock_skew_seconds: 30
+  access_token_ttl_seconds: 900
+  refresh_idle_ttl_seconds: 86400
+  authorization_cache_max_seconds: 60
+  merge_anonymous_history_automatically: false
+conversation:
+  reopen_window_hours: 72
+  default_agent_capacity: 5
+  capacity_count_statuses: [open, waiting_customer]
+  heartbeat_interval_seconds: 30
+  presence_stale_seconds: 90
+  reassignment_grace_seconds: 300
+messages:
+  text_max_characters: 8000
+  request_max_bytes: 65536
+  page_default: 50
+  page_max: 100
+  durable_event_retention_days: 7
+  idempotent_response_retention_hours: 24
+widget:
+  width_px: 380
+  height_px: 620
+  initial_position: bottom-right
+  command_buffer_max: 50
+  polling_foreground_seconds: 5
+  polling_background_seconds: 30
+  token_storage: memory
+  resume_storage: host_session_storage
+  visitor_provisional_ai_streaming: false
+ai:
+  default_mode: disabled
+  debounce_ms: 800
+  connection_timeout_seconds: 5
+  request_timeout_seconds: 45
+  run_deadline_seconds: 90
+  max_provider_attempts: 2
+  max_tool_calls: 2
+  tool_total_budget_seconds: 10
+  max_clarifications: 1
+  circuit_failure_threshold: 5
+  circuit_open_seconds: 60
+  cross_provider_fallback: false
+  preserve_raw_provider_response: false
+  preserve_hidden_reasoning: false
+rag:
+  chunk_target_tokens: 600
+  overlap_tokens: 80
+  vector_candidates: 20
+  lexical_candidates: 20
+  fused_candidates: 8
+  context_candidates: 5
+  rerank_enabled: false
+  default_embedding_dimensions: null # Must be set from the selected, tested profile.
+  visibility_default: staff_only
+queues:
+  payload_target_max_bytes: 16384
+  use_redis_cluster: false
+  queue_redis_eviction_policy: noeviction
+  core:
+    connection: redis_core
+    job_timeout_seconds: 30
+    supervisor_timeout_seconds: 40
+    retry_after_seconds: 120
+    max_attempts: 3
+  ai:
+    connection: redis_ai
+    job_timeout_seconds: 70
+    supervisor_timeout_seconds: 80
+    retry_after_seconds: 120
+    max_attempts: 2
+  knowledge:
+    connection: redis_kb
+    job_timeout_seconds: 240
+    supervisor_timeout_seconds: 270
+    retry_after_seconds: 330
+    max_attempts: 3
+  watchdog_interval_seconds: 10
+files:
+  chat_max_bytes: 10485760
+  chat_max_per_message: 5
+  knowledge_max_bytes: 20971520
+  pdf_page_limit: 200
+  signed_download_ttl_seconds: 60
+  allowed_chat_mimes:
+    - image/png
+    - image/jpeg
+    - image/webp
+    - application/pdf
+    - text/plain
+  scan_failure_policy: quarantine
+webhooks:
+  signature_algorithm: hmac-sha256
+  timestamp_window_seconds: 300
+  connection_timeout_seconds: 3
+  response_timeout_seconds: 10
+  retry_delays_seconds: [30, 120, 600, 3600, 21600, 86400]
+  max_attempts: 10
+  follow_redirects: false
+retention:
+  # Subject to operator approval; not legal advice or compliance guarantees.
+  conversations_days: 180
+  attachments_days: 180
+  audit_days: 365
+  ai_metadata_days: 90
+  raw_webhook_days: 7
+  raw_provider_debug_days: 0
+operations:
+  backup_target_rpo_minutes: 15
+  restore_target_rto_minutes: 120
+  production_requires_restore_drill: true

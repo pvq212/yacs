@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SupportDesk 嵌入契約示例</title></head>
+<body>
+  <h1>網站客服嵌入示例</h1>
+  <p>此頁是未實作 SDK 的使用契約；必須先完成本規格中的後端與 SDK，再替換域名和 inbox key。</p>
+  <p id="status" role="status"></p>
+  <!-- Fixed version URL. Add build-generated SRI and CSP nonce in production. -->
+  <script src="https://support.example.com/sdk/v1.0.0/supportdesk.js" defer></script>
+  <script>
+    window.addEventListener('load', async () => {
+      const status = document.getElementById('status');
+      try {
+        if (!window.SupportDesk) throw new Error('SDK 尚未實作或載入失敗');
+        await window.SupportDesk.init({
+          baseUrl: 'https://support.example.com',
+          inboxKey: 'REPLACE_WITH_PUBLIC_INBOX_KEY',
+          mode: 'bubble',
+          position: 'bottom-right',
+          locale: 'zh-TW',
+          context: { path: window.location.pathname },
+          // Omit identityTokenProvider for anonymous-only mode.
+          identityTokenProvider: async () => {
+            // This endpoint belongs to YOUR WEBSITE backend, not to SupportDesk.
+            // It must authenticate the actual member and mint a short-lived assertion.
+            const response = await fetch('/api/supportdesk/identity-token', {
+              method: 'GET',
+              credentials: 'same-origin',
+              cache: 'no-store',
+              headers: { Accept: 'application/json' }
+            });
+            if (!response.ok) throw new Error('無法取得客服會員身分憑證');
+            const body = await response.json();
+            if (typeof body.token !== 'string') throw new Error('身分憑證格式不符');
+            return body.token;
+          }
+        });
+        window.SupportDesk.on('error', ({ code }) => {
+          // Do not log tokens, full response bodies or private message text.
+          status.textContent = `客服連線狀態：${code}`;
+        });
+      } catch (error) {
+        status.textContent = error instanceof Error ? error.message : '客服載入失敗';
+      }
+    });
+    // Your host application's successful logout flow MUST also await:
+    // await window.SupportDesk.logout();
+    // Do not place provider API keys or the identity signing secret in this page.
+  </script>
+</body>
+</html>
