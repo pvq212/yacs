@@ -17,3 +17,10 @@ storage/framework/views/*
 tests/.artifacts
 playwright-report
 test-results
+
+storage/app/private
+storage/app/testing
+
+storage/framework/*
+
+bootstrap/cache/*.php

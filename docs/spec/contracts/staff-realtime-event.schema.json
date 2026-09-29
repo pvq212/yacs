@@ -570,6 +570,64 @@
         "data"
       ],
       "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "event_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "const": "conversation.tags.updated"
+        },
+        "workspace_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "conversation_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "event_seq": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)$"
+        },
+        "occurred_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "tag_ids": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          "required": [
+            "tag_ids"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schema_version",
+        "event_id",
+        "type",
+        "workspace_id",
+        "conversation_id",
+        "event_seq",
+        "occurred_at",
+        "data"
+      ],
+      "additionalProperties": false
     }
   ],
   "$defs": {
@@ -748,6 +806,45 @@
               "type": "null"
             }
           ]
+        },
+        "deliveries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "state": {
+                "enum": [
+                  "pending",
+                  "sending",
+                  "sent",
+                  "delivered",
+                  "read",
+                  "failed",
+                  "unknown"
+                ]
+              },
+              "error_code": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "state",
+              "error_code"
+            ],
+            "additionalProperties": false
+          }
         }
       },
       "additionalProperties": false,
@@ -796,6 +893,10 @@
         "last_event_seq": {
           "type": "string",
           "pattern": "^(0|[1-9][0-9]*)$"
+        },
+        "resolution_cycle": {
+          "type": "integer",
+          "minimum": 1
         }
       },
       "additionalProperties": false,
@@ -804,7 +905,8 @@
         "status",
         "handling_mode",
         "version",
-        "last_event_seq"
+        "last_event_seq",
+        "resolution_cycle"
       ]
     },
     "StaffConversation": {
@@ -912,6 +1014,10 @@
         "created_at": {
           "type": "string",
           "format": "date-time"
+        },
+        "resolution_cycle": {
+          "type": "integer",
+          "minimum": 1
         }
       },
       "additionalProperties": false,
@@ -927,7 +1033,8 @@
         "contact_id",
         "assignee_id",
         "team_id",
-        "created_at"
+        "created_at",
+        "resolution_cycle"
       ]
     },
     "Attachment": {

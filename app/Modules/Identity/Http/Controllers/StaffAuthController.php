@@ -13,6 +13,7 @@ use App\Modules\Identity\Staff\StaffSessionManager;
 use App\Support\Http\ApiException;
 use App\Support\Http\ApiResponse;
 use App\Support\Http\ErrorCode;
+use App\Support\Tenancy\TenantDatabase;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -56,7 +57,7 @@ final class StaffAuthController
 
         $user = User::query()->where('email_normalized', $email)->first();
         // 使用者不存在時仍做一次 hash 比對，避免以回應時間探測帳號是否存在。
-        $hash = $user?->password_hash ?? self::TIMING_EQUALIZER_HASH;
+        $hash = $user->password_hash ?? self::TIMING_EQUALIZER_HASH;
         $valid = Hash::check($password, $hash) && $user !== null && $user->password_hash !== null;
 
         if (! $valid || ! $user->isActive()) {
@@ -117,7 +118,7 @@ final class StaffAuthController
         $request->session()->forget(self::CHALLENGE_KEY);
         $this->sessions->establish($user, $request, mfaVerified: true);
 
-        return ApiResponse::data(['authenticated' => true, 'mfa_required' => false, 'challenge_id' => null]);
+        return $this->me();
     }
 
     public function logout(Request $request): Response
@@ -131,6 +132,7 @@ final class StaffAuthController
     {
         /** @var User $user */
         $user = Auth::guard('web')->user();
+        app(TenantDatabase::class)->setUser($user->id);
         $workspaceIds = DB::table('workspace_memberships as m')
             ->join('workspaces as w', 'w.id', '=', 'm.workspace_id')
             ->where('m.user_id', $user->id)

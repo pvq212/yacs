@@ -4,7 +4,14 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Modules\Ai\Adapters\LaravelAiAdapter;
+use App\Modules\Ai\Adapters\NativeHttpAdapter;
+use App\Modules\Ai\Contracts\ChatGateway;
+use App\Modules\Ai\Contracts\EmbeddingGateway;
 use App\Modules\Audit\AuditLogger;
+use App\Modules\Files\Contracts\FileScanner;
+use App\Modules\Files\Scanners\ContentValidationScanner;
+use App\Support\Extensions\Registry;
 use App\Support\Security\LookupDigest;
 use App\Support\Security\SecretBox;
 use App\Support\Tenancy\TenantDatabase;
@@ -46,6 +53,15 @@ final class AppServiceProvider extends ServiceProvider
         ));
 
         $this->app->scoped(AuditLogger::class);
+        $this->app->bind(ChatGateway::class, LaravelAiAdapter::class);
+        $this->app->bind(EmbeddingGateway::class, NativeHttpAdapter::class);
+        $this->app->singleton(Registry::class, function (): Registry {
+            $registry = new Registry;
+            $registry->register('file_scanner', 'content_validation', ContentValidationScanner::class);
+
+            return $registry;
+        });
+        $this->app->bind(FileScanner::class, fn () => $this->app->make(Registry::class)->resolve('file_scanner', (string) config('yacs.files.scanner')));
     }
 
     public function boot(): void

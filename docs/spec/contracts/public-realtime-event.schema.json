@@ -689,6 +689,45 @@
               "type": "null"
             }
           ]
+        },
+        "deliveries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "state": {
+                "enum": [
+                  "pending",
+                  "sending",
+                  "sent",
+                  "delivered",
+                  "read",
+                  "failed",
+                  "unknown"
+                ]
+              },
+              "error_code": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "state",
+              "error_code"
+            ],
+            "additionalProperties": false
+          }
         }
       },
       "additionalProperties": false,
@@ -737,6 +776,10 @@
         "last_event_seq": {
           "type": "string",
           "pattern": "^(0|[1-9][0-9]*)$"
+        },
+        "resolution_cycle": {
+          "type": "integer",
+          "minimum": 1
         }
       },
       "additionalProperties": false,
@@ -745,7 +788,8 @@
         "status",
         "handling_mode",
         "version",
-        "last_event_seq"
+        "last_event_seq",
+        "resolution_cycle"
       ]
     },
     "StaffConversation": {
@@ -853,6 +897,10 @@
         "created_at": {
           "type": "string",
           "format": "date-time"
+        },
+        "resolution_cycle": {
+          "type": "integer",
+          "minimum": 1
         }
       },
       "additionalProperties": false,
@@ -868,7 +916,8 @@
         "contact_id",
         "assignee_id",
         "team_id",
-        "created_at"
+        "created_at",
+        "resolution_cycle"
       ]
     },
     "Attachment": {

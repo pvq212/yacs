@@ -89,3 +89,5 @@ Route::middleware('staff')->group(function (): void {
         });
     });
 });
+
+require __DIR__.'/customer-service.php';

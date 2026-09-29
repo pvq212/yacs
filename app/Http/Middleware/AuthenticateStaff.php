@@ -33,7 +33,7 @@ final class AuthenticateStaff
     public function handle(Request $request, Closure $next, string $mode = 'strict'): Response
     {
         // 每個請求都從 DB 重新載入使用者（長駐程序或測試中 guard 可能快取了舊狀態）。
-        Auth::guard('web')->forgetUser();
+        Auth::forgetGuards();
         $user = Auth::guard('web')->user();
         if (! $user instanceof User) {
             throw new ApiException(ErrorCode::Unauthenticated);

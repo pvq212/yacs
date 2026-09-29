@@ -1,0 +1,277 @@
+# 正式部署：請先依 docs/manual/zh-TW/deployment.md 設定網域、SMTP、儲存與金鑰。
+name: yacs-prod
+services:
+  app:
+    build:
+      context: .
+      dockerfile: infra/docker/app/Dockerfile
+      target: prod
+    image: yacs-app:prod
+    env_file: .env
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      REDIS_QUEUE_HOST: redis-queue
+      REDIS_QUEUE_PORT: 6379
+      REDIS_CACHE_HOST: redis-cache
+      REDIS_CACHE_PORT: 6379
+      APP_ENV: production
+      APP_DEBUG: 'false'
+      SESSION_SECURE_COOKIE: 'true'
+      YACS_MFA_ENFORCEMENT: all
+      YACS_TRUSTED_PROXIES: ${YACS_TRUSTED_PROXIES:-172.16.0.0/12,10.0.0.0/8,192.168.0.0/16}
+      REVERB_HOST: reverb
+      REVERB_PORT: 8080
+      REVERB_SCHEME: http
+      YACS_PUBLIC_REVERB_HOST: ${YACS_DOMAIN:?請設定 YACS_DOMAIN}
+      YACS_PUBLIC_REVERB_PORT: 443
+      YACS_PUBLIC_REVERB_SCHEME: https
+    volumes:
+    - appstorage:/app/storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis-queue:
+        condition: service_healthy
+      redis-cache:
+        condition: service_healthy
+    restart: unless-stopped
+    command:
+    - php
+    - artisan
+    - octane:start
+    - --server=frankenphp
+    - --host=0.0.0.0
+    - --port=8000
+    - --workers=4
+    - --max-requests=500
+    healthcheck:
+      test:
+      - CMD
+      - curl
+      - -fsS
+      - http://127.0.0.1:8000/up
+      interval: 10s
+      timeout: 3s
+      retries: 10
+  reverb:
+    build:
+      context: .
+      dockerfile: infra/docker/app/Dockerfile
+      target: prod
+    image: yacs-app:prod
+    env_file: .env
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      REDIS_QUEUE_HOST: redis-queue
+      REDIS_QUEUE_PORT: 6379
+      REDIS_CACHE_HOST: redis-cache
+      REDIS_CACHE_PORT: 6379
+      APP_ENV: production
+      APP_DEBUG: 'false'
+      SESSION_SECURE_COOKIE: 'true'
+      YACS_MFA_ENFORCEMENT: all
+      YACS_TRUSTED_PROXIES: ${YACS_TRUSTED_PROXIES:-172.16.0.0/12,10.0.0.0/8,192.168.0.0/16}
+      REVERB_HOST: reverb
+      REVERB_PORT: 8080
+      REVERB_SCHEME: http
+      YACS_PUBLIC_REVERB_HOST: ${YACS_DOMAIN:?請設定 YACS_DOMAIN}
+      YACS_PUBLIC_REVERB_PORT: 443
+      YACS_PUBLIC_REVERB_SCHEME: https
+    volumes:
+    - appstorage:/app/storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis-queue:
+        condition: service_healthy
+      redis-cache:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test:
+      - CMD
+      - php
+      - -r
+      - exit(@fsockopen('127.0.0.1',8080)?0:1);
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    command:
+    - php
+    - artisan
+    - reverb:start
+    - --host=0.0.0.0
+    - --port=8080
+  horizon:
+    build:
+      context: .
+      dockerfile: infra/docker/app/Dockerfile
+      target: prod
+    image: yacs-app:prod
+    env_file: .env
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      REDIS_QUEUE_HOST: redis-queue
+      REDIS_QUEUE_PORT: 6379
+      REDIS_CACHE_HOST: redis-cache
+      REDIS_CACHE_PORT: 6379
+      APP_ENV: production
+      APP_DEBUG: 'false'
+      SESSION_SECURE_COOKIE: 'true'
+      YACS_MFA_ENFORCEMENT: all
+      YACS_TRUSTED_PROXIES: ${YACS_TRUSTED_PROXIES:-172.16.0.0/12,10.0.0.0/8,192.168.0.0/16}
+      REVERB_HOST: reverb
+      REVERB_PORT: 8080
+      REVERB_SCHEME: http
+      YACS_PUBLIC_REVERB_HOST: ${YACS_DOMAIN:?請設定 YACS_DOMAIN}
+      YACS_PUBLIC_REVERB_PORT: 443
+      YACS_PUBLIC_REVERB_SCHEME: https
+    volumes:
+    - appstorage:/app/storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis-queue:
+        condition: service_healthy
+      redis-cache:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test:
+      - CMD
+      - php
+      - artisan
+      - horizon:status
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    command:
+    - php
+    - artisan
+    - horizon
+  scheduler:
+    build:
+      context: .
+      dockerfile: infra/docker/app/Dockerfile
+      target: prod
+    image: yacs-app:prod
+    env_file: .env
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      REDIS_QUEUE_HOST: redis-queue
+      REDIS_QUEUE_PORT: 6379
+      REDIS_CACHE_HOST: redis-cache
+      REDIS_CACHE_PORT: 6379
+      APP_ENV: production
+      APP_DEBUG: 'false'
+      SESSION_SECURE_COOKIE: 'true'
+      YACS_MFA_ENFORCEMENT: all
+      YACS_TRUSTED_PROXIES: ${YACS_TRUSTED_PROXIES:-172.16.0.0/12,10.0.0.0/8,192.168.0.0/16}
+      REVERB_HOST: reverb
+      REVERB_PORT: 8080
+      REVERB_SCHEME: http
+      YACS_PUBLIC_REVERB_HOST: ${YACS_DOMAIN:?請設定 YACS_DOMAIN}
+      YACS_PUBLIC_REVERB_PORT: 443
+      YACS_PUBLIC_REVERB_SCHEME: https
+    volumes:
+    - appstorage:/app/storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis-queue:
+        condition: service_healthy
+      redis-cache:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test:
+      - CMD
+      - php
+      - -r
+      - exit(is_file('/app/storage/framework/watchdog-heartbeat')&&time()-filemtime('/app/storage/framework/watchdog-heartbeat')<60?0:1);
+      interval: 15s
+      timeout: 3s
+      retries: 10
+    command:
+    - php
+    - artisan
+    - schedule:work
+  postgres:
+    build: infra/docker/postgres
+    image: yacs-postgres:dev
+    environment:
+      POSTGRES_PASSWORD: ${YACS_DB_SUPERUSER_PASSWORD:?請設定資料庫管理密碼}
+      YACS_DB_OWNER_PASSWORD: ${DB_MIGRATOR_PASSWORD:?請設定 migration 密碼}
+      YACS_DB_RUNTIME_PASSWORD: ${DB_PASSWORD:?請設定 runtime 密碼}
+      YACS_DATABASES: yacs,yacs_test
+    volumes:
+    - pgdata:/var/lib/postgresql
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - pg_isready -U postgres
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  redis-queue:
+    image: redis:8-alpine
+    command:
+    - redis-server
+    - --appendonly
+    - 'yes'
+    - --maxmemory-policy
+    - noeviction
+    volumes:
+    - redisqueue:/data
+    healthcheck:
+      test:
+      - CMD
+      - redis-cli
+      - ping
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  redis-cache:
+    image: redis:8-alpine
+    command:
+    - redis-server
+    - --maxmemory
+    - 256mb
+    - --maxmemory-policy
+    - allkeys-lru
+    healthcheck:
+      test:
+      - CMD
+      - redis-cli
+      - ping
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  proxy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    environment:
+      YACS_DOMAIN: ${YACS_DOMAIN:?請設定 YACS_DOMAIN}
+    ports:
+    - 80:80
+    - 443:443
+    - 443:443/udp
+    volumes:
+    - ./infra/docker/Caddyfile:/etc/caddy/Caddyfile:ro
+    - caddydata:/data
+    - caddyconfig:/config
+    depends_on:
+      app:
+        condition: service_healthy
+      reverb:
+        condition: service_healthy
+volumes:
+  pgdata: null
+  redisqueue: null
+  appstorage: null
+  caddydata: null
+  caddyconfig: null

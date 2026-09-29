@@ -89,7 +89,7 @@ final class AuditLogger
             'resource_id' => $resourceId,
             'scope' => json_encode((object) $scope, JSON_UNESCAPED_UNICODE),
             'request_id' => Context::get('request_id'),
-            'ip_digest' => LookupDigest::ip($request?->ip()),
+            'ip_digest' => LookupDigest::ip($request->ip()),
             'reason' => $reason !== null ? mb_substr($reason, 0, 500) : null,
             'before_safe' => $before !== null ? json_encode(SafeSummary::filter($before), JSON_UNESCAPED_UNICODE) : null,
             'after_safe' => $after !== null ? json_encode(SafeSummary::filter($after), JSON_UNESCAPED_UNICODE) : null,

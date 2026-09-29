@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Support;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
@@ -90,6 +91,11 @@ final class StaffClient
         if ($content !== null) {
             $server['CONTENT_TYPE'] = 'application/json';
         }
+
+        // 每次 HTTP 都重新建立 guard，避免測試中的快取使用者跨瀏覽器殘留。
+        Auth::forgetGuards();
+        // Laravel 測試會重用 Session Store；清空記憶體後再由該瀏覽器 cookie 載入。
+        app('session')->driver()->flush();
 
         // cookie 值已由伺服器加密，直接原樣送回（不再二次加密）。
         $response = $this->test->call($method, $uri, [], $this->cookies, [], $server, $content);

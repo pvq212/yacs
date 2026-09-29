@@ -44,7 +44,9 @@ trait OpenApiAssertions
             : "/paths/{$pointer}/{$method}/responses/{$status}/content/application~1json/schema";
 
         $data = json_decode((string) $response->getContent(), false);
-        $result = self::openApiValidator()->validate($data, 'https://yacs.test/openapi.json#'.$responsePointer);
+        // JSON pointer 放在 URI fragment 時需百分比編碼（路徑中的 { } 不是合法 fragment 字元）。
+        $fragment = str_replace(['{', '}'], ['%7B', '%7D'], $responsePointer);
+        $result = self::openApiValidator()->validate($data, 'https://yacs.test/openapi.json#'.$fragment);
         if (! $result->isValid()) {
             $errors = (new ErrorFormatter)->format($result->error(), true);
             Assert::fail("Response of {$operationId} ({$status}) violates OpenAPI:\n".json_encode($errors, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)."\nBody: ".$response->getContent());

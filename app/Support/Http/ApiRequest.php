@@ -18,6 +18,8 @@ use Illuminate\Foundation\Http\FormRequest;
  */
 abstract class ApiRequest extends FormRequest
 {
+    abstract public function rules(): array;
+
     public function authorize(): bool
     {
         return true;

@@ -179,6 +179,9 @@ final class World
     public function grant(WorkspaceMembership $membership, string $roleKey, string $scopeType = 'workspace', ?string $scopeId = null): void
     {
         $this->in(function () use ($membership, $roleKey, $scopeType, $scopeId): void {
+            if ($roleKey === '__assign_only') {
+                $roleKey = $this->customRole('assign-only', ['roles.assign', 'staff.manage']);
+            }
             $roleId = Role::query()->where('workspace_id', $this->workspace->id)->where('key', $roleKey)->value('id');
             (new RoleBinding)->forceFill([
                 'workspace_id' => $this->workspace->id,
@@ -188,6 +191,26 @@ final class World
                 'scope_id' => $scopeId,
                 'created_at' => CarbonImmutable::now(),
             ])->save();
+        });
+    }
+
+    /**
+     * 建立（或取得）只含指定權限的自訂角色，回傳 role key。
+     *
+     * @param  list<string>  $permissions
+     */
+    public function customRole(string $key, array $permissions): string
+    {
+        return $this->in(function () use ($key, $permissions): string {
+            if (! Role::query()->where('workspace_id', $this->workspace->id)->where('key', $key)->exists()) {
+                $role = new Role;
+                $role->forceFill(['workspace_id' => $this->workspace->id, 'key' => $key, 'name' => $key, 'is_system_template' => false])->save();
+                DB::table('role_permissions')->insert(array_map(fn (string $p): array => [
+                    'workspace_id' => $this->workspace->id, 'role_id' => $role->id, 'permission_code' => $p,
+                ], $permissions));
+            }
+
+            return $key;
         });
     }
 

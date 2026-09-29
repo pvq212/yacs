@@ -11,6 +11,14 @@ x-app: &app
     target: dev
   image: yacs-app:dev
   env_file: .env
+  environment:
+    DB_HOST: postgres
+    DB_PORT: 5432
+    REDIS_QUEUE_HOST: redis-queue
+    REDIS_QUEUE_PORT: 6379
+    REDIS_CACHE_HOST: redis-cache
+    REDIS_CACHE_PORT: 6379
+    MAIL_HOST: mailpit
   volumes:
     - .:/app
   depends_on:
@@ -23,7 +31,7 @@ services:
   app:
     <<: *app
     command: ["php", "artisan", "octane:start", "--server=frankenphp", "--host=0.0.0.0", "--port=8000", "--workers=4", "--max-requests=500"]
-    ports: ["${YACS_APP_PORT:-8000}:8000"]
+    ports: ["127.0.0.1:${YACS_APP_PORT:-8000}:8000"]
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8000/up"]
       interval: 10s
@@ -32,15 +40,30 @@ services:
 
   reverb:
     <<: *app
+    healthcheck:
+      test: ["CMD", "php", "-r", "exit(@fsockopen('127.0.0.1',8080)?0:1);"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
     command: ["php", "artisan", "reverb:start", "--host=0.0.0.0", "--port=8080"]
-    ports: ["${YACS_REVERB_PORT:-8080}:8080"]
+    ports: ["127.0.0.1:${YACS_REVERB_PORT:-8080}:8080"]
 
   horizon:
     <<: *app
+    healthcheck:
+      test: ["CMD", "php", "artisan", "horizon:status"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
     command: ["php", "artisan", "horizon"]
 
   scheduler:
     <<: *app
+    healthcheck:
+      test: ["CMD", "php", "-r", "exit(is_file('/app/storage/framework/watchdog-heartbeat')&&time()-filemtime('/app/storage/framework/watchdog-heartbeat')<60?0:1);"]
+      interval: 15s
+      timeout: 3s
+      retries: 10
     # 排程含 outbox dispatcher 與 watchdog；不可與 AI queue 共用資源。
     command: ["php", "artisan", "schedule:work"]
 
@@ -52,7 +75,7 @@ services:
       YACS_DB_OWNER_PASSWORD: ${DB_MIGRATOR_PASSWORD:-owner-dev-only}
       YACS_DB_RUNTIME_PASSWORD: ${DB_PASSWORD:-runtime-dev-only}
       YACS_DATABASES: yacs,yacs_test
-    ports: ["${YACS_PG_PORT:-54320}:5432"]
+    ports: ["127.0.0.1:${YACS_PG_PORT:-54320}:5432"]
     volumes: ["pgdata:/var/lib/postgresql"]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
@@ -64,7 +87,7 @@ services:
   redis-queue:
     image: redis:8-alpine
     command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
-    ports: ["${YACS_REDIS_QUEUE_PORT:-63790}:6379"]
+    ports: ["127.0.0.1:${YACS_REDIS_QUEUE_PORT:-63790}:6379"]
     volumes: ["redisqueue:/data"]
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
@@ -76,7 +99,7 @@ services:
   redis-cache:
     image: redis:8-alpine
     command: ["redis-server", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
-    ports: ["${YACS_REDIS_CACHE_PORT:-63791}:6379"]
+    ports: ["127.0.0.1:${YACS_REDIS_CACHE_PORT:-63791}:6379"]
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -86,7 +109,7 @@ services:
   # 攔截所有外寄信件（邀請、密碼重設），Web UI: http://localhost:8025
   mailpit:
     image: axllent/mailpit:latest
-    ports: ["${YACS_MAILPIT_PORT:-8025}:8025"]
+    ports: ["127.0.0.1:${YACS_MAILPIT_PORT:-8025}:8025"]
 
   # S3 相容物件儲存（開發用）；正式環境建議 Cloudflare R2 或其他 S3 相容服務。
   s3:
@@ -95,7 +118,7 @@ services:
     volumes:
       - s3data:/data
       - ./infra/docker/seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro
-    ports: ["${YACS_S3_PORT:-8333}:8333"]
+    ports: ["127.0.0.1:${YACS_S3_PORT:-8333}:8333"]
 
 volumes:
   pgdata:

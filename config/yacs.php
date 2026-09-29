@@ -77,6 +77,7 @@ return [
     ],
 
     'ai' => [
+        'daily_call_budget' => (int) env('YACS_AI_DAILY_CALL_BUDGET', 1000),
         'default_mode' => env('YACS_AI_DEFAULT_MODE', 'disabled'),
         'debounce_ms' => 800,
         'connection_timeout_seconds' => 5,

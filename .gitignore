@@ -36,3 +36,10 @@ Thumbs.db
 .phpactor.json
 _ide_helper.php
 /auth.json
+
+# 執行時上傳與本機示範帳號
+/storage/app/private/
+/storage/app/testing/
+/storage/framework/
+/storage/logs/*
+!/storage/logs/.gitignore

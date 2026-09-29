@@ -1,0 +1,10 @@
+{$YACS_DOMAIN} {
+    encode zstd gzip
+    @reverb path /app/*
+    handle @reverb {
+        reverse_proxy reverb:8080
+    }
+    handle {
+        reverse_proxy app:8000
+    }
+}

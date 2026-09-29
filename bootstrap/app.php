@@ -13,6 +13,7 @@ use App\Http\Middleware\EnsurePlatformOperator;
 use App\Http\Middleware\FlushDeferredAudit;
 use App\Http\Middleware\ResetTenantContext;
 use App\Http\Middleware\ResolveStaffWorkspace;
+use App\Http\Middleware\ResolveWidgetInbox;
 use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\VerifyCsrfToken;
 use App\Support\Http\ExceptionRenderer;
@@ -80,6 +81,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'staff.auth' => AuthenticateStaff::class,
             'staff.workspace' => ResolveStaffWorkspace::class,
             'visitor.auth' => AuthenticateVisitor::class,
+            'widget.inbox' => ResolveWidgetInbox::class,
             'integration.auth' => AuthenticateIntegration::class,
             'idempotent' => EnsureIdempotency::class,
             'platform.operator' => EnsurePlatformOperator::class,

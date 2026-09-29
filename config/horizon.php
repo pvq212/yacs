@@ -54,7 +54,7 @@ return [
     |
     */
 
-    'use' => 'default',
+    'use' => 'queue',
 
     /*
     |--------------------------------------------------------------------------
@@ -83,7 +83,7 @@ return [
     |
     */
 
-    'middleware' => ['web'],
+    'middleware' => ['staff', 'staff.auth', 'platform.operator'],
 
     /*
     |--------------------------------------------------------------------------
@@ -196,37 +196,11 @@ return [
     |
     */
 
-    'defaults' => [
-        'supervisor-1' => [
-            'connection' => 'redis',
-            'queue' => ['default'],
-            'balance' => 'auto',
-            'autoScalingStrategy' => 'time',
-            'maxProcesses' => 1,
-            'maxTime' => 0,
-            'maxJobs' => 0,
-            'memory' => 128,
-            'tries' => 1,
-            'timeout' => 60,
-            'nice' => 0,
-        ],
-    ],
-
-    'environments' => [
-        'production' => [
-            'supervisor-1' => [
-                'maxProcesses' => 10,
-                'balanceMaxShift' => 1,
-                'balanceCooldown' => 3,
-            ],
-        ],
-
-        'local' => [
-            'supervisor-1' => [
-                'maxProcesses' => 3,
-            ],
-        ],
-    ],
+    'defaults' => collect(['core', 'ai', 'kb', 'events', 'channels'])->mapWithKeys(fn ($name) => ['supervisor-'.$name => [
+        'connection' => $name, 'queue' => [$name], 'balance' => 'auto', 'maxProcesses' => 2,
+        'memory' => 256, 'tries' => 1, 'timeout' => config('yacs.queues.'.$name.'.supervisor_timeout'),
+    ]])->all(),
+    'environments' => ['production' => [], 'local' => []],
 
     /*
     |--------------------------------------------------------------------------

@@ -38,7 +38,7 @@ final class ExceptionRenderer
         );
 
         $exceptions->render(static function (Throwable $e, Request $request) {
-            if (! self::isApi($request)) {
+            if (! self::isApi($request) && ! ($e instanceof ApiException && $request->expectsJson())) {
                 return null;
             }
 

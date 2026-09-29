@@ -2,8 +2,9 @@ openapi: 3.1.0
 info:
   title: YACS Core API Contract
   version: 1.0.0
-  description: Design contract, not a deployed service. Covers core M0–M3 routes; remaining administrative detail routes must
-    be expanded before implementation. External channel-specific APIs are out of scope.
+  description: Design contract, not a deployed service. Covers core M0–M3 routes;
+    remaining administrative detail routes must be expanded before implementation.
+    External channel-specific APIs are out of scope.
 servers:
 - url: https://yacs.example.com
 paths:
@@ -882,8 +883,9 @@ paths:
           type: string
           format: uuid
       - $ref: '#/components/parameters/IdempotencyKey'
-      description: Success means persisted, not necessarily externally delivered. Queue and WebSocket delivery may follow.
-        Retrying identical source/client id must return the existing message.
+      description: Success means persisted, not necessarily externally delivered.
+        Queue and WebSocket delivery may follow. Retrying identical source/client
+        id must return the existing message.
       requestBody:
         required: true
         content:
@@ -1499,8 +1501,9 @@ paths:
           type: string
           format: uuid
       - $ref: '#/components/parameters/IdempotencyKey'
-      description: Success means persisted, not necessarily externally delivered. Queue and WebSocket delivery may follow.
-        Retrying identical source/client id must return the existing message.
+      description: Success means persisted, not necessarily externally delivered.
+        Queue and WebSocket delivery may follow. Retrying identical source/client
+        id must return the existing message.
       requestBody:
         required: true
         content:
@@ -2277,8 +2280,8 @@ paths:
           $ref: '#/components/responses/TemporarilyUnavailable'
       parameters:
       - $ref: '#/components/parameters/IdempotencyKey'
-      description: Visitor uploads are restricted to purpose=chat and 10 MiB, even though staff can upload knowledge files
-        up to 20 MiB.
+      description: Visitor uploads are restricted to purpose=chat and 10 MiB, even
+        though staff can upload knowledge files up to 20 MiB.
       requestBody:
         required: true
         content:
@@ -2476,8 +2479,8 @@ paths:
           type: string
           format: uuid
       - $ref: '#/components/parameters/IdempotencyKey'
-      description: Visitor uploads are restricted to purpose=chat and 10 MiB, even though staff can upload knowledge files
-        up to 20 MiB.
+      description: Visitor uploads are restricted to purpose=chat and 10 MiB, even
+        though staff can upload knowledge files up to 20 MiB.
       requestBody:
         required: true
         content:
@@ -5048,20 +5051,29 @@ paths:
       operationId: probeProvider
       tags:
       - AI
-      summary: Test explicitly selected model capabilities
+      summary: 測試指定模型的單一能力
       security:
       - StaffSession: []
         CsrfHeader: []
       responses:
-        '202':
-          description: Durably accepted; processing is asynchronous
+        '200':
+          description: Success
           content:
             application/json:
               schema:
                 type: object
                 properties:
                   data:
-                    $ref: '#/components/schemas/Task'
+                    type: object
+                    properties:
+                      verified:
+                        type: boolean
+                      capability:
+                        type: string
+                    additionalProperties: false
+                    required:
+                    - verified
+                    - capability
                   meta:
                     $ref: '#/components/schemas/Meta'
                 additionalProperties: false
@@ -6038,20 +6050,24 @@ paths:
           maxLength: 64
       - name: resource_id
         in: query
-        schema: &id001
+        schema:
           type: string
           format: uuid
       - name: actor_id
         in: query
-        schema: *id001
+        schema:
+          type: string
+          format: uuid
       - name: from
         in: query
-        schema: &id002
+        schema:
           type: string
           format: date-time
       - name: to
         in: query
-        schema: *id002
+        schema:
+          type: string
+          format: date-time
   /api/v1/workspaces/{workspace_id}/reports/summary:
     get:
       operationId: getReportSummary
@@ -6548,8 +6564,9 @@ paths:
         schema:
           type: string
           maxLength: 128
-      description: Signature uses exact raw bytes. For message.created, external_contact.subject is required; for delivery
-        updates resolve existing message mapping. Return 2xx only after DB commit.
+      description: Signature uses exact raw bytes. For message.created, external_contact.subject
+        is required; for delivery updates resolve existing message mapping. Return
+        2xx only after DB commit.
       requestBody:
         required: true
         content:
@@ -6561,7 +6578,8 @@ paths:
       operationId: forgotPassword
       tags:
       - Auth
-      summary: Request a password reset email (response is identical whether or not the account exists)
+      summary: Request a password reset email (response is identical whether or not
+        the account exists)
       security:
       - CsrfHeader: []
       responses:
@@ -6862,7 +6880,8 @@ paths:
       operationId: getWorkspaceMe
       tags:
       - Operations
-      summary: Current membership and effective grants in this workspace (UI hints only; server re-checks every action)
+      summary: Current membership and effective grants in this workspace (UI hints
+        only; server re-checks every action)
       security:
       - StaffSession: []
       responses:
@@ -6895,7 +6914,9 @@ paths:
       - name: workspace_id
         in: path
         required: true
-        schema: *id001
+        schema:
+          type: string
+          format: uuid
   /api/v1/workspaces/{workspace_id}/members/{member_id}/role-bindings:
     get:
       operationId: getMemberRoleBindings
@@ -6934,16 +6955,21 @@ paths:
       - name: workspace_id
         in: path
         required: true
-        schema: *id001
+        schema:
+          type: string
+          format: uuid
       - name: member_id
         in: path
         required: true
-        schema: *id001
+        schema:
+          type: string
+          format: uuid
     put:
       operationId: replaceMemberRoleBindings
       tags:
       - Operations
-      summary: Replace role bindings; every added or removed binding must be within the caller's own grants (SEC-005)
+      summary: Replace role bindings; every added or removed binding must be within
+        the caller's own grants (SEC-005)
       security:
       - StaffSession: []
         CsrfHeader: []
@@ -6983,11 +7009,15 @@ paths:
       - name: workspace_id
         in: path
         required: true
-        schema: *id001
+        schema:
+          type: string
+          format: uuid
       - name: member_id
         in: path
         required: true
-        schema: *id001
+        schema:
+          type: string
+          format: uuid
       - $ref: '#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -6995,6 +7025,1716 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/MemberRoleBindingsReplace'
+  /api/v1/workspaces/{workspace_id}/identity-issuers:
+    get:
+      operationId: listIdentityIssuer
+      tags:
+      - Operations
+      summary: list IdentityIssuer
+      security:
+      - StaffSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/IdentityIssuer'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '410':
+          $ref: '#/components/responses/CursorExpired'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+    post:
+      operationId: createIdentityIssuer
+      tags:
+      - Operations
+      summary: create IdentityIssuer
+      security:
+      - StaffSession: []
+        CsrfHeader: []
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/IdentityIssuer'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '410':
+          $ref: '#/components/responses/CursorExpired'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentityIssuerCreate'
+  /api/v1/workspaces/{workspace_id}/identity-issuers/{resource_id}:
+    get:
+      operationId: getIdentityIssuer
+      tags:
+      - Operations
+      summary: get IdentityIssuer
+      security:
+      - StaffSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/IdentityIssuer'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '410':
+          $ref: '#/components/responses/CursorExpired'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resource_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    patch:
+      operationId: updateIdentityIssuer
+      tags:
+      - Operations
+      summary: update IdentityIssuer
+      security:
+      - StaffSession: []
+        CsrfHeader: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/IdentityIssuer'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '410':
+          $ref: '#/components/responses/CursorExpired'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resource_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentityIssuerPatch'
+  /api/v1/workspaces/{workspace_id}/channel-connectors:
+    get:
+      operationId: listChannelConnector
+      tags:
+      - Operations
+      summary: list ChannelConnector
+      security:
+      - StaffSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ChannelConnector'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '410':
+          $ref: '#/components/responses/CursorExpired'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+    post:
+      operationId: createChannelConnector
+      tags:
+      - Operations
+      summary: create ChannelConnector
+      security:
+      - StaffSession: []
+        CsrfHeader: []
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ChannelConnector'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '410':
+          $ref: '#/components/responses/CursorExpired'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelConnectorCreate'
+  /api/v1/workspaces/{workspace_id}/channel-connectors/{resource_id}:
+    get:
+      operationId: getChannelConnector
+      tags:
+      - Operations
+      summary: get ChannelConnector
+      security:
+      - StaffSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ChannelConnector'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '410':
+          $ref: '#/components/responses/CursorExpired'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resource_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    patch:
+      operationId: updateChannelConnector
+      tags:
+      - Operations
+      summary: update ChannelConnector
+      security:
+      - StaffSession: []
+        CsrfHeader: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ChannelConnector'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '410':
+          $ref: '#/components/responses/CursorExpired'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resource_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelConnectorPatch'
+  /api/v1/workspaces/{workspace_id}/business-hours:
+    get:
+      operationId: listBusinessHours
+      tags:
+      - Operations
+      summary: list BusinessHours
+      security:
+      - StaffSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BusinessHours'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '410':
+          $ref: '#/components/responses/CursorExpired'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+    post:
+      operationId: createBusinessHours
+      tags:
+      - Operations
+      summary: create BusinessHours
+      security:
+      - StaffSession: []
+        CsrfHeader: []
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/BusinessHours'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '410':
+          $ref: '#/components/responses/CursorExpired'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BusinessHoursCreate'
+  /api/v1/workspaces/{workspace_id}/business-hours/{resource_id}:
+    get:
+      operationId: getBusinessHours
+      tags:
+      - Operations
+      summary: get BusinessHours
+      security:
+      - StaffSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/BusinessHours'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '410':
+          $ref: '#/components/responses/CursorExpired'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resource_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    patch:
+      operationId: updateBusinessHours
+      tags:
+      - Operations
+      summary: update BusinessHours
+      security:
+      - StaffSession: []
+        CsrfHeader: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/BusinessHours'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '410':
+          $ref: '#/components/responses/CursorExpired'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resource_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BusinessHoursPatch'
+  /api/v1/workspaces/{workspace_id}/macros:
+    get:
+      operationId: listMacro
+      tags:
+      - Operations
+      summary: list Macro
+      security:
+      - StaffSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Macro'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '410':
+          $ref: '#/components/responses/CursorExpired'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+    post:
+      operationId: createMacro
+      tags:
+      - Operations
+      summary: create Macro
+      security:
+      - StaffSession: []
+        CsrfHeader: []
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Macro'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '410':
+          $ref: '#/components/responses/CursorExpired'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MacroCreate'
+  /api/v1/workspaces/{workspace_id}/macros/{resource_id}:
+    get:
+      operationId: getMacro
+      tags:
+      - Operations
+      summary: get Macro
+      security:
+      - StaffSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Macro'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '410':
+          $ref: '#/components/responses/CursorExpired'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resource_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    patch:
+      operationId: updateMacro
+      tags:
+      - Operations
+      summary: update Macro
+      security:
+      - StaffSession: []
+        CsrfHeader: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Macro'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '410':
+          $ref: '#/components/responses/CursorExpired'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resource_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MacroPatch'
+  /api/v1/workspaces/{workspace_id}/tags:
+    get:
+      operationId: listTag
+      tags:
+      - Operations
+      summary: list Tag
+      security:
+      - StaffSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Tag'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '410':
+          $ref: '#/components/responses/CursorExpired'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+    post:
+      operationId: createTag
+      tags:
+      - Operations
+      summary: create Tag
+      security:
+      - StaffSession: []
+        CsrfHeader: []
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Tag'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '410':
+          $ref: '#/components/responses/CursorExpired'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagCreate'
+  /api/v1/workspaces/{workspace_id}/tags/{resource_id}:
+    get:
+      operationId: getTag
+      tags:
+      - Operations
+      summary: get Tag
+      security:
+      - StaffSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Tag'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '410':
+          $ref: '#/components/responses/CursorExpired'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resource_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    patch:
+      operationId: updateTag
+      tags:
+      - Operations
+      summary: update Tag
+      security:
+      - StaffSession: []
+        CsrfHeader: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Tag'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '410':
+          $ref: '#/components/responses/CursorExpired'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resource_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagPatch'
+  /api/v1/workspaces/{workspace_id}/resolution-reasons:
+    get:
+      operationId: listResolutionReason
+      tags:
+      - Operations
+      summary: list ResolutionReason
+      security:
+      - StaffSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ResolutionReason'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '410':
+          $ref: '#/components/responses/CursorExpired'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+    post:
+      operationId: createResolutionReason
+      tags:
+      - Operations
+      summary: create ResolutionReason
+      security:
+      - StaffSession: []
+        CsrfHeader: []
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ResolutionReason'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '410':
+          $ref: '#/components/responses/CursorExpired'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResolutionReasonCreate'
+  /api/v1/workspaces/{workspace_id}/resolution-reasons/{resource_id}:
+    get:
+      operationId: getResolutionReason
+      tags:
+      - Operations
+      summary: get ResolutionReason
+      security:
+      - StaffSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ResolutionReason'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '410':
+          $ref: '#/components/responses/CursorExpired'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resource_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    patch:
+      operationId: updateResolutionReason
+      tags:
+      - Operations
+      summary: update ResolutionReason
+      security:
+      - StaffSession: []
+        CsrfHeader: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ResolutionReason'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '410':
+          $ref: '#/components/responses/CursorExpired'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resource_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResolutionReasonPatch'
+  /api/v1/workspaces/{workspace_id}/customer-attributes:
+    get:
+      operationId: listCustomerAttribute
+      tags:
+      - Operations
+      summary: list CustomerAttribute
+      security:
+      - StaffSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CustomerAttribute'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '410':
+          $ref: '#/components/responses/CursorExpired'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+    post:
+      operationId: createCustomerAttribute
+      tags:
+      - Operations
+      summary: create CustomerAttribute
+      security:
+      - StaffSession: []
+        CsrfHeader: []
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CustomerAttribute'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '410':
+          $ref: '#/components/responses/CursorExpired'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerAttributeCreate'
+  /api/v1/workspaces/{workspace_id}/customer-attributes/{resource_id}:
+    get:
+      operationId: getCustomerAttribute
+      tags:
+      - Operations
+      summary: get CustomerAttribute
+      security:
+      - StaffSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CustomerAttribute'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '410':
+          $ref: '#/components/responses/CursorExpired'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resource_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    patch:
+      operationId: updateCustomerAttribute
+      tags:
+      - Operations
+      summary: update CustomerAttribute
+      security:
+      - StaffSession: []
+        CsrfHeader: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CustomerAttribute'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '410':
+          $ref: '#/components/responses/CursorExpired'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resource_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerAttributePatch'
+  /api/v1/workspaces/{workspace_id}/contacts/{contact_id}:
+    get:
+      operationId: getContactDetail
+      tags:
+      - Conversations
+      summary: 讀取可見案件客戶與授權屬性
+      security:
+      - StaffSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ContactDetail'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '410':
+          $ref: '#/components/responses/CursorExpired'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: contact_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+  /api/v1/workspaces/{workspace_id}/conversations/{conversation_id}/tags:
+    put:
+      operationId: replaceConversationTags
+      tags:
+      - Conversations
+      summary: 取代案件標籤
+      security:
+      - StaffSession: []
+        CsrfHeader: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/StaffConversation'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '410':
+          $ref: '#/components/responses/CursorExpired'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: conversation_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                expected_version:
+                  type: string
+                  pattern: ^(0|[1-9][0-9]*)$
+                tag_ids:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                  maxItems: 100
+              additionalProperties: false
+              required:
+              - expected_version
+              - tag_ids
+    get:
+      operationId: listConversationTags
+      tags:
+      - Conversations
+      summary: 讀取案件標籤
+      security:
+      - StaffSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Tag'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                additionalProperties: false
+                required:
+                - data
+                - meta
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '410':
+          $ref: '#/components/responses/CursorExpired'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/TemporarilyUnavailable'
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: conversation_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
 components:
   schemas:
     UUID:
@@ -7065,6 +8805,13 @@ components:
         created_at:
           type: string
           format: date-time
+        result:
+          type: object
+          properties:
+            file_id:
+              type: string
+              format: uuid
+          additionalProperties: false
       additionalProperties: false
       required:
       - id
@@ -7359,6 +9106,32 @@ components:
           - type: string
             format: uuid
           - type: 'null'
+        deliveries:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              state:
+                enum:
+                - pending
+                - sending
+                - sent
+                - delivered
+                - read
+                - failed
+                - unknown
+              error_code:
+                anyOf:
+                - type: string
+                - type: 'null'
+            required:
+            - id
+            - state
+            - error_code
+            additionalProperties: false
       additionalProperties: false
       required:
       - id
@@ -7397,6 +9170,9 @@ components:
         last_event_seq:
           type: string
           pattern: ^(0|[1-9][0-9]*)$
+        resolution_cycle:
+          type: integer
+          minimum: 1
       additionalProperties: false
       required:
       - id
@@ -7404,6 +9180,7 @@ components:
       - handling_mode
       - version
       - last_event_seq
+      - resolution_cycle
     StaffConversation:
       type: object
       properties:
@@ -7468,6 +9245,9 @@ components:
         created_at:
           type: string
           format: date-time
+        resolution_cycle:
+          type: integer
+          minimum: 1
       additionalProperties: false
       required:
       - id
@@ -7482,6 +9262,7 @@ components:
       - assignee_id
       - team_id
       - created_at
+      - resolution_cycle
     WidgetContext:
       type: object
       properties:
@@ -8146,9 +9927,10 @@ components:
             format: uuid
         public_key:
           type: string
-        business_hours_id: &id003
+        business_hours_id:
           anyOf:
-          - *id001
+          - type: string
+            format: uuid
           - type: 'null'
         settings:
           $ref: '#/components/schemas/InboxSettings'
@@ -8210,7 +9992,11 @@ components:
           items:
             type: string
             format: uuid
-        business_hours_id: *id003
+        business_hours_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
         settings:
           $ref: '#/components/schemas/InboxSettings'
       additionalProperties: false
@@ -8257,7 +10043,11 @@ components:
         expected_version:
           type: string
           pattern: ^(0|[1-9][0-9]*)$
-        business_hours_id: *id003
+        business_hours_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
         settings:
           $ref: '#/components/schemas/InboxSettings'
       additionalProperties: false
@@ -8720,7 +10510,6 @@ components:
       - protocol
       - base_url
       - status
-      - egress_policy_id
     ProviderConnectionCreate:
       type: object
       properties:
@@ -8764,7 +10553,6 @@ components:
       - protocol
       - base_url
       - status
-      - egress_policy_id
     ProviderConnectionPatch:
       type: object
       properties:
@@ -9284,6 +11072,7 @@ components:
       - url
       - event_types
       - status
+      - secret
     WebhookEndpointPatch:
       type: object
       properties:
@@ -9554,6 +11343,13 @@ components:
                 anyOf:
                 - type: number
                 - type: 'null'
+              title:
+                type: string
+              public_url:
+                anyOf:
+                - type: string
+                  format: uri
+                - type: 'null'
             additionalProperties: false
             required:
             - chunk_id
@@ -9561,8 +11357,10 @@ components:
             - label
             - text
         profile_id:
-          type: string
-          format: uuid
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
         degraded:
           type: boolean
       additionalProperties: false
@@ -9837,7 +11635,7 @@ components:
         event_id:
           type: string
           minLength: 1
-          maxLength: 255
+          maxLength: 200
         type:
           type: string
           enum:
@@ -9849,12 +11647,13 @@ components:
         external_thread_id:
           type: string
           minLength: 1
-          maxLength: 255
+          maxLength: 200
         external_contact:
           type: object
           properties:
             subject:
               type: string
+              maxLength: 200
             name:
               type: string
           additionalProperties: false
@@ -9865,6 +11664,7 @@ components:
           properties:
             external_message_id:
               type: string
+              maxLength: 200
             body_text:
               type: string
               maxLength: 8000
@@ -9881,6 +11681,9 @@ components:
               - delivered
               - read
               - failed
+            delivery_id:
+              type: string
+              format: uuid
           additionalProperties: false
           required:
           - external_message_id
@@ -10884,6 +12687,48 @@ components:
         - occurred_at
         - data
         additionalProperties: false
+      - type: object
+        properties:
+          schema_version:
+            const: '1.0'
+          event_id:
+            type: string
+            format: uuid
+          type:
+            const: conversation.tags.updated
+          workspace_id:
+            type: string
+            format: uuid
+          conversation_id:
+            type: string
+            format: uuid
+          event_seq:
+            type: string
+            pattern: ^(0|[1-9][0-9]*)$
+          occurred_at:
+            type: string
+            format: date-time
+          data:
+            type: object
+            properties:
+              tag_ids:
+                type: array
+                items:
+                  type: string
+                  format: uuid
+            required:
+            - tag_ids
+            additionalProperties: false
+        required:
+        - schema_version
+        - event_id
+        - type
+        - workspace_id
+        - conversation_id
+        - event_seq
+        - occurred_at
+        - data
+        additionalProperties: false
       description: staff audience projection; validate before broadcasting.
     InboxSettings:
       type: object
@@ -10908,7 +12753,9 @@ components:
     RoleBinding:
       type: object
       properties:
-        role_id: *id001
+        role_id:
+          type: string
+          format: uuid
         scope_type:
           type: string
           enum:
@@ -10916,7 +12763,11 @@ components:
           - brand
           - inbox
           - team
-        scope_id: *id003
+        scope_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
       additionalProperties: false
       required:
       - role_id
@@ -10925,7 +12776,9 @@ components:
     MemberRoleBindings:
       type: object
       properties:
-        member_id: *id001
+        member_id:
+          type: string
+          format: uuid
         role_bindings:
           type: array
           items:
@@ -10958,7 +12811,11 @@ components:
           - brand
           - inbox
           - team
-        scope_id: *id003
+        scope_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
       additionalProperties: false
       required:
       - permission
@@ -10969,10 +12826,16 @@ components:
       properties:
         workspace:
           $ref: '#/components/schemas/Workspace'
-        membership_id: *id001
+        membership_id:
+          type: string
+          format: uuid
         display_name:
           type: string
-        staff_session_id: *id003
+        staff_session_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
         permission_codes:
           type: array
           items:
@@ -11105,7 +12968,9 @@ components:
           format: email
         requires_password:
           type: boolean
-        expires_at: *id002
+        expires_at:
+          type: string
+          format: date-time
       additionalProperties: false
       required:
       - workspace_name
@@ -11130,6 +12995,983 @@ components:
       additionalProperties: false
       required:
       - token
+    IdentityIssuerCreate:
+      type: object
+      properties:
+        brand_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        issuer:
+          type: string
+          minLength: 1
+          maxLength: 300
+        key_id:
+          type: string
+          minLength: 1
+          maxLength: 100
+        inbox_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          maxItems: 100
+        secret:
+          type: string
+          minLength: 44
+          maxLength: 8192
+          writeOnly: true
+          pattern: ^[A-Za-z0-9+/]+={0,2}$
+          description: 至少 32 bytes 隨機金鑰的 base64 編碼，與 identity-issuer.php 範例一致。
+        status:
+          type: string
+          enum:
+          - active
+          - disabled
+      additionalProperties: false
+      required:
+      - brand_id
+      - name
+      - issuer
+      - key_id
+      - secret
+      - status
+    IdentityIssuerPatch:
+      type: object
+      properties:
+        brand_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        issuer:
+          type: string
+          minLength: 1
+          maxLength: 300
+        key_id:
+          type: string
+          minLength: 1
+          maxLength: 100
+        inbox_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          maxItems: 100
+        secret:
+          type: string
+          minLength: 44
+          maxLength: 8192
+          writeOnly: true
+          pattern: ^[A-Za-z0-9+/]+={0,2}$
+          description: 至少 32 bytes 隨機金鑰的 base64 編碼，與 identity-issuer.php 範例一致。
+        status:
+          type: string
+          enum:
+          - active
+          - disabled
+        expected_version:
+          type: string
+          pattern: ^(0|[1-9][0-9]*)$
+      additionalProperties: false
+      required:
+      - expected_version
+    IdentityIssuer:
+      type: object
+      properties:
+        brand_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        issuer:
+          type: string
+          minLength: 1
+          maxLength: 300
+        key_id:
+          type: string
+          minLength: 1
+          maxLength: 100
+        inbox_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          maxItems: 100
+        status:
+          type: string
+          enum:
+          - active
+          - disabled
+        id:
+          type: string
+          format: uuid
+        version:
+          type: string
+          pattern: ^(0|[1-9][0-9]*)$
+        secret_present:
+          type: boolean
+      additionalProperties: false
+      required:
+      - id
+      - version
+      - brand_id
+      - name
+      - issuer
+      - key_id
+      - status
+    ChannelConnectorCreate:
+      type: object
+      properties:
+        brand_id:
+          type: string
+          format: uuid
+        inbox_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        type:
+          type: string
+          enum:
+          - generic_webhook
+        key_id:
+          type: string
+          minLength: 1
+          maxLength: 64
+        secret:
+          type: string
+          minLength: 32
+          maxLength: 8192
+          writeOnly: true
+        outbound_url:
+          anyOf:
+          - type: string
+            format: uri
+            maxLength: 1000
+          - type: 'null'
+        status:
+          type: string
+          enum:
+          - active
+          - disabled
+      additionalProperties: false
+      required:
+      - brand_id
+      - inbox_id
+      - name
+      - type
+      - key_id
+      - secret
+      - status
+    ChannelConnectorPatch:
+      type: object
+      properties:
+        brand_id:
+          type: string
+          format: uuid
+        inbox_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        type:
+          type: string
+          enum:
+          - generic_webhook
+        key_id:
+          type: string
+          minLength: 1
+          maxLength: 64
+        secret:
+          type: string
+          minLength: 32
+          maxLength: 8192
+          writeOnly: true
+        outbound_url:
+          anyOf:
+          - type: string
+            format: uri
+            maxLength: 1000
+          - type: 'null'
+        status:
+          type: string
+          enum:
+          - active
+          - disabled
+        expected_version:
+          type: string
+          pattern: ^(0|[1-9][0-9]*)$
+      additionalProperties: false
+      required:
+      - expected_version
+    ChannelConnector:
+      type: object
+      properties:
+        brand_id:
+          type: string
+          format: uuid
+        inbox_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        type:
+          type: string
+          enum:
+          - generic_webhook
+        key_id:
+          type: string
+          minLength: 1
+          maxLength: 64
+        outbound_url:
+          anyOf:
+          - type: string
+            format: uri
+            maxLength: 1000
+          - type: 'null'
+        status:
+          type: string
+          enum:
+          - active
+          - disabled
+        id:
+          type: string
+          format: uuid
+        version:
+          type: string
+          pattern: ^(0|[1-9][0-9]*)$
+        secret_present:
+          type: boolean
+        public_key:
+          type: string
+          minLength: 1
+          maxLength: 64
+        health:
+          type: string
+        circuit_state:
+          type: string
+      additionalProperties: false
+      required:
+      - id
+      - version
+      - brand_id
+      - inbox_id
+      - name
+      - type
+      - key_id
+      - status
+    BusinessHoursCreate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        timezone:
+          type: string
+          minLength: 1
+          maxLength: 64
+        weekly_schedule:
+          type: object
+          properties:
+            mon:
+              type: array
+              items:
+                type: array
+                items:
+                  type: string
+                  pattern: ^[0-2][0-9]:[0-5][0-9]$
+                minItems: 2
+                maxItems: 2
+              maxItems: 6
+            tue:
+              type: array
+              items:
+                type: array
+                items:
+                  type: string
+                  pattern: ^[0-2][0-9]:[0-5][0-9]$
+                minItems: 2
+                maxItems: 2
+              maxItems: 6
+            wed:
+              type: array
+              items:
+                type: array
+                items:
+                  type: string
+                  pattern: ^[0-2][0-9]:[0-5][0-9]$
+                minItems: 2
+                maxItems: 2
+              maxItems: 6
+            thu:
+              type: array
+              items:
+                type: array
+                items:
+                  type: string
+                  pattern: ^[0-2][0-9]:[0-5][0-9]$
+                minItems: 2
+                maxItems: 2
+              maxItems: 6
+            fri:
+              type: array
+              items:
+                type: array
+                items:
+                  type: string
+                  pattern: ^[0-2][0-9]:[0-5][0-9]$
+                minItems: 2
+                maxItems: 2
+              maxItems: 6
+            sat:
+              type: array
+              items:
+                type: array
+                items:
+                  type: string
+                  pattern: ^[0-2][0-9]:[0-5][0-9]$
+                minItems: 2
+                maxItems: 2
+              maxItems: 6
+            sun:
+              type: array
+              items:
+                type: array
+                items:
+                  type: string
+                  pattern: ^[0-2][0-9]:[0-5][0-9]$
+                minItems: 2
+                maxItems: 2
+              maxItems: 6
+          additionalProperties: false
+        holidays:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              name:
+                type: string
+                minLength: 1
+                maxLength: 200
+              closed:
+                type: boolean
+            additionalProperties: false
+            required:
+            - date
+            - closed
+      additionalProperties: false
+      required:
+      - name
+      - timezone
+      - weekly_schedule
+    BusinessHoursPatch:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        timezone:
+          type: string
+          minLength: 1
+          maxLength: 64
+        weekly_schedule:
+          type: object
+          properties:
+            mon:
+              type: array
+              items:
+                type: array
+                items:
+                  type: string
+                  pattern: ^[0-2][0-9]:[0-5][0-9]$
+                minItems: 2
+                maxItems: 2
+              maxItems: 6
+            tue:
+              type: array
+              items:
+                type: array
+                items:
+                  type: string
+                  pattern: ^[0-2][0-9]:[0-5][0-9]$
+                minItems: 2
+                maxItems: 2
+              maxItems: 6
+            wed:
+              type: array
+              items:
+                type: array
+                items:
+                  type: string
+                  pattern: ^[0-2][0-9]:[0-5][0-9]$
+                minItems: 2
+                maxItems: 2
+              maxItems: 6
+            thu:
+              type: array
+              items:
+                type: array
+                items:
+                  type: string
+                  pattern: ^[0-2][0-9]:[0-5][0-9]$
+                minItems: 2
+                maxItems: 2
+              maxItems: 6
+            fri:
+              type: array
+              items:
+                type: array
+                items:
+                  type: string
+                  pattern: ^[0-2][0-9]:[0-5][0-9]$
+                minItems: 2
+                maxItems: 2
+              maxItems: 6
+            sat:
+              type: array
+              items:
+                type: array
+                items:
+                  type: string
+                  pattern: ^[0-2][0-9]:[0-5][0-9]$
+                minItems: 2
+                maxItems: 2
+              maxItems: 6
+            sun:
+              type: array
+              items:
+                type: array
+                items:
+                  type: string
+                  pattern: ^[0-2][0-9]:[0-5][0-9]$
+                minItems: 2
+                maxItems: 2
+              maxItems: 6
+          additionalProperties: false
+        holidays:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              name:
+                type: string
+                minLength: 1
+                maxLength: 200
+              closed:
+                type: boolean
+            additionalProperties: false
+            required:
+            - date
+            - closed
+        expected_version:
+          type: string
+          pattern: ^(0|[1-9][0-9]*)$
+      additionalProperties: false
+      required:
+      - expected_version
+    BusinessHours:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        timezone:
+          type: string
+          minLength: 1
+          maxLength: 64
+        weekly_schedule:
+          type: object
+          properties:
+            mon:
+              type: array
+              items:
+                type: array
+                items:
+                  type: string
+                  pattern: ^[0-2][0-9]:[0-5][0-9]$
+                minItems: 2
+                maxItems: 2
+              maxItems: 6
+            tue:
+              type: array
+              items:
+                type: array
+                items:
+                  type: string
+                  pattern: ^[0-2][0-9]:[0-5][0-9]$
+                minItems: 2
+                maxItems: 2
+              maxItems: 6
+            wed:
+              type: array
+              items:
+                type: array
+                items:
+                  type: string
+                  pattern: ^[0-2][0-9]:[0-5][0-9]$
+                minItems: 2
+                maxItems: 2
+              maxItems: 6
+            thu:
+              type: array
+              items:
+                type: array
+                items:
+                  type: string
+                  pattern: ^[0-2][0-9]:[0-5][0-9]$
+                minItems: 2
+                maxItems: 2
+              maxItems: 6
+            fri:
+              type: array
+              items:
+                type: array
+                items:
+                  type: string
+                  pattern: ^[0-2][0-9]:[0-5][0-9]$
+                minItems: 2
+                maxItems: 2
+              maxItems: 6
+            sat:
+              type: array
+              items:
+                type: array
+                items:
+                  type: string
+                  pattern: ^[0-2][0-9]:[0-5][0-9]$
+                minItems: 2
+                maxItems: 2
+              maxItems: 6
+            sun:
+              type: array
+              items:
+                type: array
+                items:
+                  type: string
+                  pattern: ^[0-2][0-9]:[0-5][0-9]$
+                minItems: 2
+                maxItems: 2
+              maxItems: 6
+          additionalProperties: false
+        holidays:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              name:
+                type: string
+                minLength: 1
+                maxLength: 200
+              closed:
+                type: boolean
+            additionalProperties: false
+            required:
+            - date
+            - closed
+        id:
+          type: string
+          format: uuid
+        version:
+          type: string
+          pattern: ^(0|[1-9][0-9]*)$
+      additionalProperties: false
+      required:
+      - id
+      - version
+      - name
+      - timezone
+      - weekly_schedule
+    MacroCreate:
+      type: object
+      properties:
+        brand_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        body_template:
+          type: string
+          minLength: 1
+          maxLength: 8000
+        status:
+          type: string
+          enum:
+          - active
+          - disabled
+      additionalProperties: false
+      required:
+      - title
+      - body_template
+      - status
+    MacroPatch:
+      type: object
+      properties:
+        brand_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        body_template:
+          type: string
+          minLength: 1
+          maxLength: 8000
+        status:
+          type: string
+          enum:
+          - active
+          - disabled
+        expected_version:
+          type: string
+          pattern: ^(0|[1-9][0-9]*)$
+      additionalProperties: false
+      required:
+      - expected_version
+    Macro:
+      type: object
+      properties:
+        brand_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        body_template:
+          type: string
+          minLength: 1
+          maxLength: 8000
+        status:
+          type: string
+          enum:
+          - active
+          - disabled
+        id:
+          type: string
+          format: uuid
+        version:
+          type: string
+          pattern: ^(0|[1-9][0-9]*)$
+      additionalProperties: false
+      required:
+      - id
+      - version
+      - title
+      - body_template
+      - status
+    TagCreate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        color_token:
+          type: string
+          enum:
+          - neutral
+          - blue
+          - green
+          - amber
+          - red
+          - purple
+      additionalProperties: false
+      required:
+      - name
+    TagPatch:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        color_token:
+          type: string
+          enum:
+          - neutral
+          - blue
+          - green
+          - amber
+          - red
+          - purple
+        expected_version:
+          type: string
+          pattern: ^(0|[1-9][0-9]*)$
+      additionalProperties: false
+      required:
+      - expected_version
+    Tag:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        color_token:
+          type: string
+          enum:
+          - neutral
+          - blue
+          - green
+          - amber
+          - red
+          - purple
+        id:
+          type: string
+          format: uuid
+        version:
+          type: string
+          pattern: ^(0|[1-9][0-9]*)$
+      additionalProperties: false
+      required:
+      - id
+      - version
+      - name
+    ResolutionReasonCreate:
+      type: object
+      properties:
+        code:
+          type: string
+          pattern: ^[a-z][a-z0-9_]{0,63}$
+        label:
+          type: string
+          minLength: 1
+          maxLength: 200
+        status:
+          type: string
+          enum:
+          - active
+          - disabled
+        position:
+          type: integer
+          minimum: 0
+          maximum: 65535
+      additionalProperties: false
+      required:
+      - code
+      - label
+      - status
+    ResolutionReasonPatch:
+      type: object
+      properties:
+        code:
+          type: string
+          pattern: ^[a-z][a-z0-9_]{0,63}$
+        label:
+          type: string
+          minLength: 1
+          maxLength: 200
+        status:
+          type: string
+          enum:
+          - active
+          - disabled
+        position:
+          type: integer
+          minimum: 0
+          maximum: 65535
+        expected_version:
+          type: string
+          pattern: ^(0|[1-9][0-9]*)$
+      additionalProperties: false
+      required:
+      - expected_version
+    ResolutionReason:
+      type: object
+      properties:
+        code:
+          type: string
+          pattern: ^[a-z][a-z0-9_]{0,63}$
+        label:
+          type: string
+          minLength: 1
+          maxLength: 200
+        status:
+          type: string
+          enum:
+          - active
+          - disabled
+        position:
+          type: integer
+          minimum: 0
+          maximum: 65535
+        id:
+          type: string
+          format: uuid
+        version:
+          type: string
+          pattern: ^(0|[1-9][0-9]*)$
+      additionalProperties: false
+      required:
+      - id
+      - version
+      - code
+      - label
+      - status
+    CustomerAttributeCreate:
+      type: object
+      properties:
+        key:
+          type: string
+          pattern: ^[a-z][a-z0-9_]{0,63}$
+        label:
+          type: string
+          minLength: 1
+          maxLength: 200
+        type:
+          type: string
+          enum:
+          - string
+          - number
+          - boolean
+          - date
+        visibility:
+          type: string
+          enum:
+          - staff
+          - sensitive
+        editable_by_visitor:
+          type: boolean
+      additionalProperties: false
+      required:
+      - key
+      - label
+      - type
+      - visibility
+      - editable_by_visitor
+    CustomerAttributePatch:
+      type: object
+      properties:
+        key:
+          type: string
+          pattern: ^[a-z][a-z0-9_]{0,63}$
+        label:
+          type: string
+          minLength: 1
+          maxLength: 200
+        type:
+          type: string
+          enum:
+          - string
+          - number
+          - boolean
+          - date
+        visibility:
+          type: string
+          enum:
+          - staff
+          - sensitive
+        editable_by_visitor:
+          type: boolean
+        expected_version:
+          type: string
+          pattern: ^(0|[1-9][0-9]*)$
+      additionalProperties: false
+      required:
+      - expected_version
+    CustomerAttribute:
+      type: object
+      properties:
+        key:
+          type: string
+          pattern: ^[a-z][a-z0-9_]{0,63}$
+        label:
+          type: string
+          minLength: 1
+          maxLength: 200
+        type:
+          type: string
+          enum:
+          - string
+          - number
+          - boolean
+          - date
+        visibility:
+          type: string
+          enum:
+          - staff
+          - sensitive
+        editable_by_visitor:
+          type: boolean
+        id:
+          type: string
+          format: uuid
+        version:
+          type: string
+          pattern: ^(0|[1-9][0-9]*)$
+      additionalProperties: false
+      required:
+      - id
+      - version
+      - key
+      - label
+      - type
+      - visibility
+      - editable_by_visitor
+    ContactDetail:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        brand_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        identity_level:
+          type: string
+        email:
+          anyOf:
+          - type: string
+          - type: 'null'
+        attributes:
+          type: object
+          properties: {}
+          additionalProperties: true
+      additionalProperties: false
+      required:
+      - id
+      - brand_id
+      - name
+      - identity_level
+      - email
+      - attributes
   securitySchemes:
     StaffSession:
       type: apiKey

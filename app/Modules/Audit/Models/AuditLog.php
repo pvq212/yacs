@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Modules\Audit\Models;
 
 use App\Support\Database\TenantModel;
+use Carbon\CarbonImmutable;
 
 /**
  * 稽核紀錄（append-only）；before/after 只保存非 secret 摘要。
  *
+ * @property CarbonImmutable $created_at
  * @property string $id
  * @property string $workspace_id
  * @property string $actor_type
