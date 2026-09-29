@@ -90,8 +90,8 @@ final class ChannelTest extends TestCase
             app(Webhooks::class)->tick();
             app(Webhooks::class)->tick();
             $this->assertSame('paused', DB::table('webhook_endpoints')->where('id', $endpoint)->value('status'));
-            $this->assertSame(1,DB::table('webhook_deliveries')->count());
-            $this->assertSame(1,DB::table('webhook_attempts')->count());
+            $this->assertSame(1, DB::table('webhook_deliveries')->count());
+            $this->assertSame(1, DB::table('webhook_attempts')->count());
         });
         Http::assertSentCount(1);
     }
