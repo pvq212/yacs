@@ -11,4 +11,6 @@ npm ci
 npm run build
 docker compose run --rm --no-deps app php artisan migrate --database=pgsql_migrator --force
 docker compose run --rm --no-deps app php artisan yacs:demo
+# Docker 建立的 0600 示範帳號仍保持私有，由目前主機使用者持有。
+docker compose run --rm --no-deps app chown -R "$(id -u):$(id -g)" /app/storage /app/bootstrap/cache
 docker compose up -d --wait app reverb horizon scheduler

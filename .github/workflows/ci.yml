@@ -49,6 +49,7 @@ jobs:
           docker compose up -d --wait postgres redis-cache redis-queue mailpit
           docker compose run --rm --no-deps app php artisan migrate --database=pgsql_migrator --force
           docker compose run --rm --no-deps app php artisan yacs:demo
+          sudo chown -R "$(id -u):$(id -g)" storage bootstrap/cache
           docker compose up -d --wait app reverb horizon scheduler
           npx playwright install --with-deps chromium
           npm run test:browser
