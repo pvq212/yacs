@@ -33,7 +33,9 @@ final class KnowledgeController
         if ($op === 'previewKnowledgeSearch') {
             $auth->authorize(Permission::KnowledgeEdit, app(ScopeResolver::class)->forInbox($input['inbox_id']));
 
-            return ApiResponse::data(app(KnowledgeRetriever::class)->search($input['inbox_id'], $input['query'], $input['mode'] !== 'staff_assist', 'hybrid'));
+            $external = $input['mode'] !== 'staff_assist';
+
+            return ApiResponse::data(app(KnowledgeRetriever::class)->search($input['inbox_id'], $input['query'], $external, $external ? 'hybrid' : 'lexical'));
         }
         $documentId = $request->route('document_id');
         $versionId = $request->route('version_id');
@@ -112,7 +114,7 @@ final class KnowledgeController
                 if ($total === 0) {
                     throw new ApiException(ErrorCode::InvalidState);
                 }
-                if ($kb->active_embedding_profile_id !== null && DB::table('knowledge_embeddings as e')->join('knowledge_chunks as c', 'c.id', '=', 'e.chunk_id')->where('c.version_id', $version->id)->where('e.embedding_profile_id', $kb->active_embedding_profile_id)->count() !== $total) {
+                if ($version->visibility === 'external_answerable' && $kb->active_embedding_profile_id !== null && DB::table('knowledge_embeddings as e')->join('knowledge_chunks as c', 'c.id', '=', 'e.chunk_id')->where('c.version_id', $version->id)->where('e.embedding_profile_id', $kb->active_embedding_profile_id)->count() !== $total) {
                     throw new ApiException(ErrorCode::InvalidState);
                 }
                 DB::table('knowledge_versions')->where('id', $version->id)->update(['state' => 'published', 'approved_by' => $actor->membershipId(), 'published_at' => now(), 'updated_at' => now()]);

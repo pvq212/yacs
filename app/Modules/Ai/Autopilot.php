@@ -81,7 +81,8 @@ final class Autopilot
 
             return;
         }
-        $search = app(KnowledgeRetriever::class)->search($c->inbox_id, $question, $run->kind === 'autopilot');
+        // 草稿也使用外部供應商；staff_only 不得因 staff 模式而外傳。
+        $search = app(KnowledgeRetriever::class)->search($c->inbox_id, $question, true);
         if ($search['sources'] === []) {
             $this->fail($run, 'no_approved_sources', $taskId, $lease);
 

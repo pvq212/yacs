@@ -29,7 +29,7 @@ final class KnowledgeIndex
         if ($chunks === []) {
             throw new ApiException(ErrorCode::ValidationFailed);
         }
-        $profile = $kb->active_embedding_profile_id ? DB::table('embedding_profiles')->where('id', $kb->active_embedding_profile_id)->where('status', 'active')->first() : null;
+        $profile = $version->visibility === 'external_answerable' && $kb->active_embedding_profile_id ? DB::table('embedding_profiles')->where('id', $kb->active_embedding_profile_id)->where('status', 'active')->first() : null;
         $vectors = null;
         if ($profile !== null) {
             $vectors = app(EmbeddingGateway::class)->embed(DB::table('provider_connections')->where('id', $profile->connection_id)->first(), DB::table('ai_models')->where('id', $profile->model_id)->first(), $chunks, (int) $profile->dimensions);

@@ -13,7 +13,7 @@
 
 ## 知識與 AI
 
-管理員在「知識庫」建立知識庫、選擇所屬品牌及收件匣；新增 FAQ／文字／Markdown／PDF 版本，完成索引後發布。草稿、撤回與 `staff_only` 不會成為訪客 FAQ 或自動回覆來源。掃描 PDF 若無可提取文字會回 `OCR_REQUIRED`，本版不假裝完成 OCR。
+管理員在「知識庫」建立知識庫、選擇所屬品牌及收件匣；新增 FAQ／文字／Markdown／PDF 版本，完成索引後發布。草稿與撤回版本不會成為訪客 FAQ 或 AI 回覆來源。`staff_only` 僅供本機 staff 檢索，不送往外部 chat／embedding，也不會進入 AI 草稿或自動回覆。掃描 PDF 若無可提取文字會回 `OCR_REQUIRED`，本版不假裝完成 OCR。
 
 「管理 → AI 連線／模型」配置協定、端點及秘密，再測試文字模型。建立 AI 設定、選擇已驗證文字模型，編輯收件匣套用 `ai_profile_id`。
 

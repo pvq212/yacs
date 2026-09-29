@@ -10,7 +10,7 @@
 
 | 檢查 | 結果與界線 |
 |---|---|
-| 後端整合測試 | 51 項通過，使用真實 PostgreSQL 18、PGroonga／pgvector 與受 RLS 約束的 runtime 角色 |
+| 後端整合測試 | 52 項通過，使用真實 PostgreSQL 18、PGroonga／pgvector 與受 RLS 約束的 runtime 角色 |
 | API 契約 | 每個已文件化 operation 的 route name、HTTP method、path 完整對照；關鍵回應以 OpenAPI 驗證 |
 | 靜態檢查 | Pint、PHPStan level 5、Composer validate、Vue／TypeScript 型別檢查通過 |
 | 前端單元測試 | 2 項通過 |
@@ -20,6 +20,8 @@
 | R2 | `yacs` bucket 全新物件 put/get/delete 通過，瀏覽器新附件完成掃描；新遠端物件以 envelope 加密，應用授權下載才解密 |
 | Docker | 開發服務健康，正式映像成功建置；未進行正式 DNS／TLS 上線 |
 | CI | workflow 已提供並隨 push 觸發；本機成功不代表遠端 CI 已通過，遠端結果以 GitHub Actions 為準 |
+
+`staff_only` 知識僅本機全文檢索，不送外部 chat／embedding；草稿與自動回覆都只採用核准對外知識。另有回歸確認內部知識在啟用 embedding 的知識庫仍能索引、發布與本機預覽。
 
 背景任務、AI 與外送的主要回歸包含：過期 lease、晚到 AI、人工先接手、知識 generation 更動、同連線備援、每日生成預算、worker 停止時 watchdog 轉人工、HMAC 去重、503 重試、401 暫停、投遞狀態不降級。安全回歸包含 MFA、CSRF、refresh 重放撤銷、會員 issuer 隔離、停用立刻撤權、跨租戶外鍵及 RLS、附件隔離、短效下載重新授權、匯出到期，以及遠端密文不能移到另一個 object key 解密。
 

@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Tests\Feature\Ai;
 
 use App\Modules\Ai\Adapters\LaravelAiAdapter;
+use App\Modules\Ai\Autopilot;
 use App\Modules\Ai\Contracts\ChatGateway;
+use App\Modules\Ai\Contracts\EmbeddingGateway;
 use App\Modules\Ai\DTOs\ChatRequest;
 use App\Modules\Ai\DTOs\ChatResult;
 use App\Modules\Conversations\Assignments;
@@ -85,6 +87,50 @@ final class AutopilotTest extends TestCase
         $staff->post("/api/v1/workspaces/{$world->workspace->id}/provider-connections/$connection/probe", ['model_id' => $model, 'capabilities' => ['text']])->assertConflict();
         $world->in(function () use ($model): void {
             $this->assertSame('unverified', DB::table('ai_models')->where('id', $model)->value('verification_state'));
+        });
+    }
+
+    public function test_staff_only_knowledge_is_local_and_never_sent_to_chat_or_embedding(): void
+    {
+        [$world, $conversation, , $connection, $model] = $this->fixture();
+        $embedding = new class implements EmbeddingGateway
+        {
+            public int $calls = 0;
+
+            public function embed(object $connection, object $model, array $texts, ?int $dimensions = null): array
+            {
+                $this->calls++;
+                throw new \RuntimeException('Internal knowledge must not be sent to embeddings.');
+            }
+        };
+        $this->app->instance(EmbeddingGateway::class, $embedding);
+        $this->fake(fn () => $this->fail('Internal knowledge must not be sent to chat.'));
+        $versionId = $world->in(function () use ($world, $connection, $model): string {
+            $version = DB::table('knowledge_versions')->first();
+            $profile = R::id();
+            DB::table('embedding_profiles')->insert(['id' => $profile, 'workspace_id' => $world->workspace->id, 'name' => 'External embeddings', 'connection_id' => $connection, 'model_id' => $model, 'dimensions' => 3, 'created_at' => now(), 'updated_at' => now()]);
+            DB::table('knowledge_bases')->update(['active_embedding_profile_id' => $profile]);
+            DB::table('knowledge_versions')->where('id', $version->id)->update(['visibility' => 'staff_only', 'state' => 'draft']);
+            app(KnowledgeIndex::class)->index($version->id);
+            $this->assertSame('ready', DB::table('knowledge_versions')->where('id', $version->id)->value('state'));
+            $this->assertSame(0, DB::table('knowledge_embeddings')->count());
+
+            return $version->id;
+        });
+        $staff = StaffClient::loginAs($this, $world->ownerStaff());
+        $base = '/api/v1/workspaces/'.$world->workspace->id;
+        $staff->post("$base/knowledge-versions/$versionId/publish", ['expected_published_version_id' => $versionId])->assertOk();
+        $preview = $staff->post("$base/knowledge-search", ['inbox_id' => $conversation->inbox_id, 'query' => '退款', 'mode' => 'staff_assist']);
+        $preview->assertOk();
+        $this->assertCount(1, $preview->json('data.sources'));
+        $this->assertSame(0, $embedding->calls);
+        $world->in(function () use ($world, $conversation): void {
+            $run = app(Autopilot::class)->enqueue($conversation, 'assist_draft', $world->ownerMembership->id);
+            DB::table('async_tasks')->where('id', $run->task_id)->update(['not_before' => now()->subSecond()]);
+            app(Tasks::class)->run($run->task_id, $world->workspace->id);
+            $this->assertSame('failed', DB::table('ai_runs')->where('id', $run->id)->value('state'));
+            $this->assertSame('no_approved_sources', DB::table('ai_runs')->where('id', $run->id)->value('failure_code'));
+            $this->assertSame(0, DB::table('ai_attempts')->count());
         });
     }
 
